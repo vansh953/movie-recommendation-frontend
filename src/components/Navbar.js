@@ -6,14 +6,11 @@ function Navbar() {
 
     return (
         <div className="header">
-            <button className="signin-btn" onClick={() => navigate('/signin')}>
-                Sign In
-            </button>
-            <button className="signup-btn" onClick={() => navigate('/signup')}>
-                Sign Up
-            </button>
+            <button className="signin-btn" onClick={() => navigate('/signin')}>Sign In</button>
+            <button className="signup-btn" onClick={() => navigate('/signup')}>Sign Up</button>
         </div>
     );
 }
 
 export default Navbar;
+
