@@ -34,7 +34,6 @@ body {
     z-index: -1;
 }
 
-/* Navbar */
 .header {
     width: 100%;
     padding: 20px 5%;
@@ -58,7 +57,6 @@ body {
 .signin-btn:hover { background-color: #0056b3; }
 .signup-btn:hover { background-color: #00bfa5; }
 
-/* Hero Section */
 .hero-section {
     height: 100vh;
     display: flex;
@@ -89,7 +87,6 @@ body {
 }
 .cta-button:hover { background-color: #00bfa5; transform: scale(1.05); }
 
-/* Responsive */
 @media (max-width: 768px) {
     .hero-section h1 { font-size: 2rem; margin-bottom: 30px; }
     .hero-section h2 { font-size: 1.5rem; margin-bottom: 20px; }

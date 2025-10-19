@@ -23,8 +23,6 @@ body {
     overflow-x: hidden;
     background: #000;
 }
-
-/* Background image with blur */
 .background-container {
     position: fixed;
     top: 0;
@@ -38,7 +36,6 @@ body {
     filter: blur(6px) brightness(0.7);
 }
 
-/* Overlay for better readability */
 .overlay {
     position: fixed;
     top: 0;
@@ -49,7 +46,6 @@ body {
     z-index: -1;
 }
 
-/* Login container */
 .login-container {
     display: flex;
     justify-content: center;
@@ -58,7 +54,6 @@ body {
     padding: 20px;
 }
 
-/* Card */
 .login-card {
     width: 100%;
     max-width: 400px;
@@ -76,8 +71,6 @@ body {
     transform: translateY(-5px);
     box-shadow: 0 10px 50px rgba(0,0,0,0.7), 0 0 35px rgba(77,196,188,0.4);
 }
-
-/* Welcome text */
 .welcome-text {
     font-size: 2em;
     font-weight: 700;
@@ -85,8 +78,6 @@ body {
     letter-spacing: 1px;
     text-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
-
-/* Input fields */
 .input-group {
     position: relative;
     margin-bottom: 20px;
@@ -121,8 +112,6 @@ body {
 .input-group input::placeholder {
     color: #ccc;
 }
-
-/* Forgot password link */
 .forgot-password {
     display: block;
     text-align: right;
@@ -136,8 +125,6 @@ body {
 .forgot-password:hover {
     color: var(--primary-color);
 }
-
-/* OR separator */
 .or-separator {
     color: #aaa;
     margin: 20px 0;
@@ -158,7 +145,6 @@ body {
 .or-separator::before { left: 0; }
 .or-separator::after { right: 0; }
 
-/* Buttons */
 .btn {
     width: 100%;
     padding: 15px;
@@ -199,8 +185,6 @@ body {
 .google-btn:hover {
     background: rgba(255,255,255,0.1);
 }
-
-/* Signup prompt */
 .signup-prompt {
     margin-top: 30px;
     color: #ccc;
@@ -220,7 +204,6 @@ body {
     color: #ff3842;
 }
 
-/* Responsive adjustments */
 @media (min-width: 768px) {
     .login-card {
         padding: 50px 40px;

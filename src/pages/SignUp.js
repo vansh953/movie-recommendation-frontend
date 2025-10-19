@@ -34,7 +34,7 @@ function SignUp() {
 
         if (Object.keys(tempErrors).length === 0) {
             alert("Sign Up Successful! Please login.");
-            navigate("/signin"); // <-- Redirect to login page
+            navigate("/signin"); 
         }
     };
 
