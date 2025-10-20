@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../style/Auth.css";
 
 function SignUp() {
-    const navigate = useNavigate(); // <-- For redirect
+    const navigate = useNavigate(); 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -112,3 +112,4 @@ function SignUp() {
 }
 
 export default SignUp;
+  

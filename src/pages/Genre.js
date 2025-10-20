@@ -19,7 +19,7 @@ const genres = [
   { name: "Documentary", colorClass: "documentary" }
 ];
 
-function Genre() {
+function Genre({ onNext }) {
   const [selected, setSelected] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,10 +34,8 @@ function Genre() {
   };
 
   const handleNext = () => {
-    console.log("Selected Languages:", selectedLanguages);
-    console.log("Selected Genres:", selected);
-    // You can redirect to the main app/homepage after selection
-    navigate("/", { state: { selectedLanguages, selectedGenres: selected } });
+    onNext(selected); // save selected genres in App.js
+    navigate("/"); // go to Home1 page
   };
 
   return (
@@ -66,3 +64,4 @@ function Genre() {
 }
 
 export default Genre;
+

@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Language from "./pages/Language";
 import Genre from "./pages/Genre";
+import Home1 from "./pages/Home1";
+import Navbar1 from "./pages/Navbar1";
+import Movies from "./pages/Movies";
+import Recommended from "./pages/Recommended";
+import MyProfile from "./pages/MyProfile";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -18,17 +22,34 @@ function App() {
 
   const handleLanguageSelect = (languages) => {
     setSelectedLanguages(languages);
-    setFirstLogin(false);
   };
 
   const handleGenreSelect = (genres) => {
     setSelectedGenres(genres);
+    setFirstLogin(false);
   };
 
   return (
     <Router>
+      {isLoggedIn && !firstLogin && <Navbar1 />}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? (
+              firstLogin ? (
+                <Navigate to="/select-language" />
+              ) : (
+                <Home1
+                  selectedLanguages={selectedLanguages}
+                  selectedGenres={selectedGenres}
+                />
+              )
+            ) : (
+              <Navigate to="/signin" />
+            )
+          }
+        />
 
         <Route
           path="/signin"
@@ -71,6 +92,11 @@ function App() {
             )
           }
         />
+
+        <Route path="/home" element={<Home1 selectedLanguages={selectedLanguages} selectedGenres={selectedGenres} />} />
+        <Route path="/recommended" element={<Recommended />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/my-profile" element={<MyProfile />} />
       </Routes>
     </Router>
   );
