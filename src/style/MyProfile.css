@@ -1,0 +1,103 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.profile-card {
+  background-color: #1e1e1e;
+  padding: 30px 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  width: 420px;
+}
+
+.profile-card h1 {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 25px;
+  color: #ff9800;
+}
+
+.profile-info {
+  margin-bottom: 25px;
+}
+
+.profile-field {
+  margin-bottom: 18px;
+}
+
+.profile-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
+.profile-field span {
+  display: block;
+  padding: 8px 12px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  color: #cccccc;
+}
+
+.profile-field input,
+.profile-field select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.profile-field input:focus,
+.profile-field select:focus {
+  outline: 2px solid #ff9800;
+}
+
+.profile-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:first-child {
+  background-color: #ff9800;
+  color: #ffffff;
+}
+
+.logout-btn {
+  background-color: #e53935;
+  color: #ffffff;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+.welcome-note {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+  color: #ffcc80;
+}

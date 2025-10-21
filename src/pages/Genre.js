@@ -34,8 +34,8 @@ function Genre({ onNext }) {
   };
 
   const handleNext = () => {
-    onNext(selected); // save selected genres in App.js
-    navigate("/"); // go to Home1 page
+    onNext(selected); 
+    navigate("/"); 
   };
 
   return (

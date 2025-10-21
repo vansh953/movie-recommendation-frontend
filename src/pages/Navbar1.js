@@ -10,38 +10,46 @@ function Navbar1() {
   };
 
   return (
-    <div className="navbar-container">
-      <div className="navbar-options">
+    <nav className="navbar1">
+      <div className="navbar-logo">🎬 F-Sync</div>
+      <div className="navbar-links">
         <Link
           to="/home"
-          className={`nav-item ${active === "home" ? "active" : ""}`}
+          className={`nav-link ${active === "home" ? "active" : ""}`}
           onClick={() => handleClick("home")}
         >
-          Home
+          🏠 Home
         </Link>
         <Link
           to="/recommended"
-          className={`nav-item ${active === "recommended" ? "active" : ""}`}
+          className={`nav-link ${active === "recommended" ? "active" : ""}`}
           onClick={() => handleClick("recommended")}
         >
-          Recommended
+          ⭐ Recommended
         </Link>
         <Link
           to="/movies"
-          className={`nav-item ${active === "movies" ? "active" : ""}`}
+          className={`nav-link ${active === "movies" ? "active" : ""}`}
           onClick={() => handleClick("movies")}
         >
-          Movies
+          🎞️ Movies
+        </Link>
+        <Link
+          to="/watch-history"
+          className={`nav-link ${active === "history" ? "active" : ""}`}
+          onClick={() => handleClick("history")}
+        >
+          📜 Watch History
         </Link>
         <Link
           to="/my-profile"
-          className={`nav-item ${active === "profile" ? "active" : ""}`}
+          className={`nav-link ${active === "profile" ? "active" : ""}`}
           onClick={() => handleClick("profile")}
         >
-          My Profile
+          👤 My Profile
         </Link>
       </div>
-    </div>
+    </nav>
   );
 }
 

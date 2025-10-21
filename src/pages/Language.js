@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../style/Select.css";
 
 const languages = [
@@ -36,6 +36,17 @@ function Language() {
   const handleNext = () => {
     navigate("/select-genre", { state: { selectedLanguages: selected } });
   };
+  useEffect(() => {
+    const handlePopState = (event) => {
+      navigate("/signin", { replace: true });
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [navigate]);
 
   return (
     <div className="selection-container">
@@ -63,3 +74,4 @@ function Language() {
 }
 
 export default Language;
+

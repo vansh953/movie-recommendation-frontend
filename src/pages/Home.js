@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../style/Auth.css"; 
+import "../style/Home.css"; 
 
 function Home() {
     const navigate = useNavigate();
@@ -71,5 +71,3 @@ function Home() {
 }
 
 export default Home;
-
-

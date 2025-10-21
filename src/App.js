@@ -9,6 +9,7 @@ import Navbar1 from "./pages/Navbar1";
 import Movies from "./pages/Movies";
 import Recommended from "./pages/Recommended";
 import MyProfile from "./pages/MyProfile";
+import Home from "./pages/Home"; 
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,38 +33,32 @@ function App() {
   return (
     <Router>
       {isLoggedIn && !firstLogin && <Navbar1 />}
+
       <Routes>
-        <Route
-          path="/"
+        <Route 
+          path="/" 
           element={
-            isLoggedIn ? (
-              firstLogin ? (
-                <Navigate to="/select-language" />
-              ) : (
-                <Home1
-                  selectedLanguages={selectedLanguages}
-                  selectedGenres={selectedGenres}
-                />
-              )
+            !isLoggedIn ? (
+              <Home />
+            ) : firstLogin ? (
+              <Navigate to="/select-language" />
             ) : (
-              <Navigate to="/signin" />
+              <Navigate to="/home" />
             )
-          }
+          } 
         />
 
-        <Route
-          path="/signin"
+        <Route 
+          path="/signin" 
           element={
-            isLoggedIn ? (
-              firstLogin ? (
-                <Navigate to="/select-language" />
-              ) : (
-                <Navigate to="/" />
-              )
-            ) : (
+            !isLoggedIn ? (
               <SignIn onLogin={handleLogin} />
+            ) : firstLogin ? (
+              <Navigate to="/select-language" />
+            ) : (
+              <Navigate to="/home" />
             )
-          }
+          } 
         />
 
         <Route path="/signup" element={<SignUp />} />
@@ -93,13 +88,28 @@ function App() {
           }
         />
 
-        <Route path="/home" element={<Home1 selectedLanguages={selectedLanguages} selectedGenres={selectedGenres} />} />
-        <Route path="/recommended" element={<Recommended />} />
-        <Route path="/movies" element={<Movies />} />
-        <Route path="/my-profile" element={<MyProfile />} />
+        {isLoggedIn && !firstLogin && (
+          <>
+            <Route
+              path="/home"
+              element={
+                <Home1
+                  selectedLanguages={selectedLanguages}
+                  selectedGenres={selectedGenres}
+                />
+              }
+            />
+            <Route path="/recommended" element={<Recommended />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/my-profile" element={<MyProfile setIsLoggedIn={setIsLoggedIn} setFirstLogin={setFirstLogin} />} />
+          </>
+        )}
+
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
