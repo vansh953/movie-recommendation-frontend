@@ -28,6 +28,7 @@ const movies = [
 function Home1() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [fade, setFade] = useState(true);
 
   useEffect(() => {
@@ -85,10 +86,25 @@ function Home1() {
           <div className="split-right">
             <h2>{selectedMovie.title}</h2>
             <p>{selectedMovie.longDesc}</p>
-            <button className="play-btn" onClick={() => window.open(selectedMovie.trailer, "_blank")}>
-              ▶ Play Trailer
-            </button>
-            <button className="close-btn" onClick={() => setSelectedMovie(null)}>Close</button>
+
+            {!showTrailer ? (
+              <button className="play-btn" onClick={() => setShowTrailer(true)}>
+                ▶ Play Trailer
+              </button>
+            ) : (
+              <div className="trailer-container" style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+                <iframe
+                  src={selectedMovie.trailer}
+                  title={selectedMovie.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                ></iframe>
+              </div>
+            )}
+
+            <button className="close-btn" onClick={() => { setSelectedMovie(null); setShowTrailer(false); }}>Close</button>
           </div>
         </div>
       )}
