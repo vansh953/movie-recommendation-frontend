@@ -16,9 +16,11 @@ function App() {
   const [firstLogin, setFirstLogin] = useState(true);
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [userId, setUserId] = useState(null); // <-- store logged-in user ID
 
-  const handleLogin = () => {
+  const handleLogin = (id) => {
     setIsLoggedIn(true);
+    setUserId(id); // save userId after login
   };
 
   const handleLanguageSelect = (languages) => {
@@ -99,9 +101,9 @@ function App() {
                 />
               }
             />
-            <Route path="/recommended" element={<Recommended />} />
+            <Route path="/recommended" element={<Recommended userId={userId} />} />
             <Route path="/movies" element={<Movies />} />
-            <Route path="/my-profile" element={<MyProfile setIsLoggedIn={setIsLoggedIn} setFirstLogin={setFirstLogin} />} />
+            <Route path="/my-profile" element={<MyProfile userId={userId} setIsLoggedIn={setIsLoggedIn} setFirstLogin={setFirstLogin} />} />
           </>
         )}
 
@@ -112,4 +114,3 @@ function App() {
 }
 
 export default App;
-

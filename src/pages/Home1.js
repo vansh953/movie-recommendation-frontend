@@ -29,7 +29,6 @@ function Home1() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [fade, setFade] = useState(true);
-  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -62,11 +61,7 @@ function Home1() {
     <div className="home1-container">
       {!selectedMovie ? (
         <div className={`movie-box ${fade ? "fade-in" : "fade-out"}`}>
-          <img
-            src={movies[currentIndex].cover}
-            alt={movies[currentIndex].title}
-            className="movie-image"
-          />
+          <img src={movies[currentIndex].cover} alt={movies[currentIndex].title} className="movie-image" />
           <button className="arrow left" onClick={handlePrev}>◀</button>
           <div className="movie-caption">
             <h2>{movies[currentIndex].title}</h2>
@@ -78,42 +73,22 @@ function Home1() {
           <button className="arrow right" onClick={handleNext}>▶</button>
           <div className="dots-container">
             {movies.map((_, idx) => (
-              <span
-                key={idx}
-                className={`dot ${currentIndex === idx ? "active" : ""}`}
-                onClick={() => setCurrentIndex(idx)}
-              ></span>
+              <span key={idx} className={`dot ${currentIndex === idx ? "active" : ""}`} onClick={() => setCurrentIndex(idx)}></span>
             ))}
           </div>
         </div>
       ) : (
         <div className="split-view">
           <div className="split-left">
-            {showTrailer ? (
-              <iframe
-                width="100%"
-                height="100%"
-                src={selectedMovie.trailer}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            ) : (
-              <img src={selectedMovie.cover} alt={selectedMovie.title} className="split-image" />
-            )}
+            <img src={selectedMovie.cover} alt={selectedMovie.title} className="split-image" />
           </div>
           <div className="split-right">
             <h2>{selectedMovie.title}</h2>
             <p>{selectedMovie.longDesc}</p>
-            {!showTrailer && (
-              <button className="play-btn" onClick={() => setShowTrailer(true)}>
-                ▶ Play Trailer
-              </button>
-            )}
-            <button className="close-btn" onClick={() => { setSelectedMovie(null); setShowTrailer(false); }}>
-              Close
+            <button className="play-btn" onClick={() => window.open(selectedMovie.trailer, "_blank")}>
+              ▶ Play Trailer
             </button>
+            <button className="close-btn" onClick={() => setSelectedMovie(null)}>Close</button>
           </div>
         </div>
       )}
