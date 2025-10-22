@@ -25,6 +25,7 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
 
     if (savedProfile) {
       const parsedProfile = JSON.parse(savedProfile);
+      // Prioritize the saved profile data, but fall back to the separate localStorage items
       parsedProfile.gender = selectedGender || parsedProfile.gender || "";
       parsedProfile.languages = selectedLanguages || parsedProfile.languages || "";
       parsedProfile.genres = selectedGenres || parsedProfile.genres || "";
@@ -47,11 +48,19 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
+    
+    // Optional: If the gender, languages, or genres were originally stored separately,
+    // you might want to update them in local storage immediately on change for consistency.
+    if (name === "gender") {
+        localStorage.setItem("selectedGender", value);
+    }
   };
 
   const handleEditToggle = () => {
     if (isEditing) {
       localStorage.setItem("userProfile", JSON.stringify(profile));
+      // Save the gender back to its specific localStorage key if it's still being used
+      localStorage.setItem("selectedGender", profile.gender);
     }
     setIsEditing(!isEditing);
   };
@@ -85,14 +94,23 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
               <span>{profile.email || "Not provided"}</span>
             )}
           </div>
+          
+          {/* ----- UPDATED GENDER FIELD START ----- */}
           <div className="profile-field">
             <label>Gender:</label>
             {isEditing ? (
-              <input type="text" name="gender" value={profile.gender} onChange={handleChange} placeholder="Enter gender" />
+              <select name="gender" value={profile.gender} onChange={handleChange}>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             ) : (
               <span>{profile.gender || "Not specified"}</span>
             )}
           </div>
+          {/* ----- UPDATED GENDER FIELD END ----- */}
+          
           <div className="profile-field">
             <label>Preferred Languages:</label>
             {isEditing ? (
@@ -152,4 +170,3 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
 }
 
 export default MyProfile;
-

@@ -16,8 +16,6 @@ body {
     color: var(--text-color-light);
     min-height: 100vh;
 }
-
-/* Background and overlay */
 .background-container {
     position: fixed;
     top: 0;
@@ -39,8 +37,6 @@ body {
     background-color: rgba(0, 0, 0, 0.7);
     z-index: -1;
 }
-
-/* Header buttons */
 .header {
     width: 100%;
     padding: 20px 5%;
@@ -64,6 +60,7 @@ body {
     background-color: var(--primary-color);
     color: #fff;
 }
+
 .signup-btn {
     background-color: var(--secondary-color);
     color: #000;
@@ -72,7 +69,6 @@ body {
 .signin-btn:hover { background-color: #0056b3; }
 .signup-btn:hover { background-color: #00bfa5; }
 
-/* Hero section */
 .hero-section {
     height: 100vh;
     display: flex;
@@ -85,34 +81,25 @@ body {
     padding: 0 10%;
 }
 
-.hero-section h1 {
+.hero-text {
     font-size: 4rem;
     font-weight: 900;
     margin-bottom: 20px;
     text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
 }
 
-.hero-section h1 .highlight { color: var(--secondary-color); }
-.hero-section h1 span:last-child { color: #fff; }
-
-.hero-section h2 {
+.hero-text .highlight {
+    color: var(--secondary-color);
+}
+.hero-message {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 30px;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+    opacity: 0;
+    white-space: nowrap; 
 }
 
-.hero-section h2 .highlight { color: var(--secondary-color); }
-
-.hero-section p {
-    font-size: 1.3rem;
-    font-weight: 500;
-    margin-bottom: 40px;
-    max-width: 800px;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-}
-
-/* CTA button */
 .cta-button {
     padding: 18px 40px;
     background-color: var(--secondary-color);
@@ -130,10 +117,26 @@ body {
     transform: scale(1.05);
 }
 
-/* Responsive */
+
+
+.fade-in {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
 @media (max-width: 768px) {
-    .hero-section h1 { font-size: 2.5rem; }
-    .hero-section h2 { font-size: 1.5rem; }
-    .hero-section p { font-size: 1rem; max-width: 300px; }
+    .hero-text { font-size: 2.5rem; }
+    .hero-message { font-size: 1.5rem; }
     .cta-button { font-size: 1rem; padding: 12px 25px; }
+}
+
+@media (max-width: 480px) {
+    .hero-text { font-size: 2rem; }
+    .hero-message { font-size: 1.2rem; }
+    .cta-button { font-size: 0.9rem; padding: 10px 20px; }
 }
