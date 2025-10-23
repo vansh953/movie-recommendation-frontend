@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../style/Auth.css";
-import { loginUser, loginWithGoogle } from "../api";
 
-function SignIn() {
+function SignIn({ onLogin }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const handlePopState = () => {
@@ -18,21 +14,6 @@ function SignIn() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [navigate]);
 
-  const handleLogin = async () => {
-    setError("");
-    try {
-      const res = await loginUser({ email, password });
-      if (res.success) {
-        alert("Login Successful!");
-        navigate("/"); // Redirect to home or dashboard
-      } else {
-        setError(res.message || "Login failed");
-      }
-    } catch (err) {
-      setError("Server error. Please try again.");
-    }
-  };
-
   return (
     <>
       <div className="background-container"></div>
@@ -42,36 +23,22 @@ function SignIn() {
 
           <div className="input-group">
             <span className="icon">📧</span>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="email" placeholder="Email" />
           </div>
           <div className="input-group">
             <span className="icon">🔒</span>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password" placeholder="Password" />
           </div>
 
-          {error && <small style={{ color: "red" }}>{error}</small>}
+          <a href="#" className="forgot-password">Forgot Password?</a>
 
-          <a href="#" className="forgot-password">
-            Forgot Password?
-          </a>
-
-          <button className="btn sign-in-btn" onClick={handleLogin}>
+          <button className="btn sign-in-btn" onClick={onLogin}>
             Sign In
           </button>
 
           <div className="or-separator">OR</div>
 
-          <button className="btn google-btn" onClick={loginWithGoogle}>
+          <button className="btn google-btn">
             <span className="google-icon">🟢</span> Sign in with Google
           </button>
 
