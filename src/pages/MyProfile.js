@@ -7,6 +7,7 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
   const [isEditing, setIsEditing] = useState(false);
 
   const [profile, setProfile] = useState({
+    name: "",
     email: "",
     mobile: "",
     gender: "",
@@ -25,7 +26,6 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
 
     if (savedProfile) {
       const parsedProfile = JSON.parse(savedProfile);
-      // Prioritize the saved profile data, but fall back to the separate localStorage items
       parsedProfile.gender = selectedGender || parsedProfile.gender || "";
       parsedProfile.languages = selectedLanguages || parsedProfile.languages || "";
       parsedProfile.genres = selectedGenres || parsedProfile.genres || "";
@@ -33,6 +33,7 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
     } else {
       const userEmail = localStorage.getItem("userEmail") || "";
       setProfile({
+        name: "",
         email: userEmail,
         mobile: "",
         gender: selectedGender || "",
@@ -48,18 +49,14 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
-    
-    // Optional: If the gender, languages, or genres were originally stored separately,
-    // you might want to update them in local storage immediately on change for consistency.
     if (name === "gender") {
-        localStorage.setItem("selectedGender", value);
+      localStorage.setItem("selectedGender", value);
     }
   };
 
   const handleEditToggle = () => {
     if (isEditing) {
       localStorage.setItem("userProfile", JSON.stringify(profile));
-      // Save the gender back to its specific localStorage key if it's still being used
       localStorage.setItem("selectedGender", profile.gender);
     }
     setIsEditing(!isEditing);
@@ -87,6 +84,14 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
         <h1>My Profile</h1>
         <div className="profile-info">
           <div className="profile-field">
+            <label>Name:</label>
+            {isEditing ? (
+              <input type="text" name="name" value={profile.name} onChange={handleChange} placeholder="Enter your name" />
+            ) : (
+              <span>{profile.name || "Not provided"}</span>
+            )}
+          </div>
+          <div className="profile-field">
             <label>Email:</label>
             {isEditing ? (
               <input type="email" name="email" value={profile.email} onChange={handleChange} placeholder="Enter your email" />
@@ -94,8 +99,6 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
               <span>{profile.email || "Not provided"}</span>
             )}
           </div>
-          
-          {/* ----- UPDATED GENDER FIELD START ----- */}
           <div className="profile-field">
             <label>Gender:</label>
             {isEditing ? (
@@ -109,8 +112,6 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
               <span>{profile.gender || "Not specified"}</span>
             )}
           </div>
-          {/* ----- UPDATED GENDER FIELD END ----- */}
-          
           <div className="profile-field">
             <label>Preferred Languages:</label>
             {isEditing ? (

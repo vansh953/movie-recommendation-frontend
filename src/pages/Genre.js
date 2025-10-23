@@ -16,21 +16,17 @@ const genres = [
   { name: "Musical", colorClass: "musical" },
   { name: "Animation", colorClass: "animation" },
   { name: "Biography", colorClass: "biography" },
-  { name: "Documentary", colorClass: "documentary" }
+  { name: "Documentary", colorClass: "documentary" },
 ];
 
 function Genre({ onNext }) {
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedLanguages = location.state?.selectedLanguages || [];
+  const selectedLanguage = location.state?.selectedLanguage || "";
 
   const toggleGenre = (genre) => {
-    if (selected.includes(genre)) {
-      setSelected(selected.filter((g) => g !== genre));
-    } else {
-      setSelected([...selected, genre]);
-    }
+    setSelected(selected === genre ? "" : genre);
   };
 
   const handleNext = () => {
@@ -40,12 +36,12 @@ function Genre({ onNext }) {
 
   return (
     <div className="selection-container">
-      <h1 className="title">Choose your favourite genres</h1>
+      <h1 className="title">Choose your favourite genre</h1>
       <div className="grid">
         {genres.map((genre) => (
           <button
             key={genre.name}
-            className={`card ${genre.colorClass} ${selected.includes(genre.name) ? "selected" : ""}`}
+            className={`card ${genre.colorClass} ${selected === genre.name ? "selected" : ""}`}
             onClick={() => toggleGenre(genre.name)}
           >
             {genre.name}
@@ -55,7 +51,7 @@ function Genre({ onNext }) {
       <button
         className="next-button"
         onClick={handleNext}
-        disabled={selected.length < 1}
+        disabled={!selected}
       >
         Finish
       </button>
@@ -64,4 +60,3 @@ function Genre({ onNext }) {
 }
 
 export default Genre;
-

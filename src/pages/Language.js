@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../style/Select.css";
 
 const languages = [
@@ -22,40 +22,33 @@ const languages = [
 ];
 
 function Language() {
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState("");
   const navigate = useNavigate();
 
   const toggleLanguage = (lang) => {
-    if (selected.includes(lang)) {
-      setSelected(selected.filter((l) => l !== lang));
-    } else {
-      setSelected([...selected, lang]);
-    }
+    setSelected(selected === lang ? "" : lang);
   };
 
   const handleNext = () => {
-    navigate("/select-genre", { state: { selectedLanguages: selected } });
+    navigate("/select-genre", { state: { selectedLanguage: selected } });
   };
+
   useEffect(() => {
-    const handlePopState = (event) => {
+    const handlePopState = () => {
       navigate("/signin", { replace: true });
     };
-
     window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [navigate]);
 
   return (
     <div className="selection-container">
-      <h1 className="title">Choose your Preferable languages</h1>
+      <h1 className="title">Choose your Preferable language</h1>
       <div className="grid">
         {languages.map((lang) => (
           <button
             key={lang.name}
-            className={`card ${lang.colorClass} ${selected.includes(lang.name) ? "selected" : ""}`}
+            className={`card ${lang.colorClass} ${selected === lang.name ? "selected" : ""}`}
             onClick={() => toggleLanguage(lang.name)}
           >
             {lang.name}
@@ -65,7 +58,7 @@ function Language() {
       <button
         className="next-button"
         onClick={handleNext}
-        disabled={selected.length < 1}
+        disabled={!selected}
       >
         Next
       </button>
@@ -74,4 +67,3 @@ function Language() {
 }
 
 export default Language;
-
