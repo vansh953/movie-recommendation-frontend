@@ -42,6 +42,13 @@ function Navbar1() {
           📜 Watch History
         </Link>
         <Link
+          to="/bookmarks"
+          className={`nav-link ${active === "bookmarks" ? "active" : ""}`}
+          onClick={() => handleClick("bookmarks")}
+        >
+          🔖 Bookmarks
+        </Link>
+        <Link
           to="/my-profile"
           className={`nav-link ${active === "profile" ? "active" : ""}`}
           onClick={() => handleClick("profile")}

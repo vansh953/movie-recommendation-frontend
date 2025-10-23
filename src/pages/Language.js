@@ -65,7 +65,7 @@ function Language() {
       <button
         className="next-button"
         onClick={handleNext}
-        disabled={selected.length < 2}
+        disabled={selected.length < 1}
       >
         Next
       </button>

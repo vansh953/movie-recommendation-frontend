@@ -58,6 +58,18 @@ function Home1() {
     }, 500);
   };
 
+  // Bookmark handler
+  const handleBookmark = (movie) => {
+    const stored = JSON.parse(localStorage.getItem("bookmarkedMovies")) || [];
+    if (!stored.find((m) => m.title === movie.title)) {
+      stored.push(movie);
+      localStorage.setItem("bookmarkedMovies", JSON.stringify(stored));
+      alert(`${movie.title} bookmarked!`);
+    } else {
+      alert(`${movie.title} is already bookmarked.`);
+    }
+  };
+
   return (
     <div className="home1-container">
       {!selectedMovie ? (
@@ -104,7 +116,14 @@ function Home1() {
               </div>
             )}
 
-            <button className="close-btn" onClick={() => { setSelectedMovie(null); setShowTrailer(false); }}>Close</button>
+            {/* Bookmark button */}
+            <button className="bookmark-btn" onClick={() => handleBookmark(selectedMovie)}>
+              ★ Bookmark
+            </button>
+
+            <button className="close-btn" onClick={() => { setSelectedMovie(null); setShowTrailer(false); }}>
+              Close
+            </button>
           </div>
         </div>
       )}
@@ -113,3 +132,4 @@ function Home1() {
 }
 
 export default Home1;
+
