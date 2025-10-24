@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import jwtDecode from "jwt-decode"; // fixed import
 
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -11,43 +11,39 @@ import Navbar1 from "./pages/Navbar1";
 import Movies from "./pages/Movies";
 import Recommended from "./pages/Recommended";
 import MyProfile from "./pages/MyProfile";
-import Home from "./pages/Home"; 
-import AuthCallback from "./pages/AuthCallback"; 
+import Home from "./pages/Home";
+import AuthCallback from "./pages/AuthCallback";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [firstLogin, setFirstLogin] = useState(true); 
+  const [firstLogin, setFirstLogin] = useState(true);
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [userId, setUserId] = useState(null);
 
   const handleLogin = (tokenOrId) => {
     let id;
-    
-    if (typeof tokenOrId === 'string' && tokenOrId.length > 50) {
-        try {
-            const decodedToken = jwtDecode(tokenOrId);
-            id = decodedToken.id; 
-            localStorage.setItem('authToken', tokenOrId); 
-        } catch (e) {
-            console.error("Invalid token:", e);
-            return; 
-        }
-    } else if (tokenOrId) { 
-        id = tokenOrId;
-       
+
+    if (typeof tokenOrId === "string" && tokenOrId.length > 50) {
+      try {
+        const decodedToken = jwtDecode(tokenOrId);
+        id = decodedToken.id;
+        localStorage.setItem("authToken", tokenOrId);
+      } catch (e) {
+        console.error("Invalid token:", e);
+        return;
+      }
+    } else if (tokenOrId) {
+      id = tokenOrId;
     }
 
     if (id) {
-        setIsLoggedIn(true);
-        setUserId(id);
-  
+      setIsLoggedIn(true);
+      setUserId(id);
     }
   };
 
-  const handleLanguageSelect = (languages) => {
-    setSelectedLanguages(languages);
-  };
-
+  const handleLanguageSelect = (languages) => setSelectedLanguages(languages);
   const handleGenreSelect = (genres) => {
     setSelectedGenres(genres);
     setFirstLogin(false);
@@ -58,8 +54,8 @@ function App() {
       {isLoggedIn && !firstLogin && <Navbar1 />}
 
       <Routes>
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             !isLoggedIn ? (
               <Home />
@@ -68,20 +64,20 @@ function App() {
             ) : (
               <Navigate to="/home" />
             )
-          } 
+          }
         />
 
-        <Route 
-          path="/signin" 
+        <Route
+          path="/signin"
           element={
             !isLoggedIn ? (
-              <SignIn onLogin={handleLogin} /> 
+              <SignIn onLogin={handleLogin} />
             ) : firstLogin ? (
               <Navigate to="/select-language" />
             ) : (
               <Navigate to="/home" />
             )
-          } 
+          }
         />
 
         <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />
@@ -94,11 +90,7 @@ function App() {
         <Route
           path="/select-language"
           element={
-            isLoggedIn ? (
-              <Language onNext={handleLanguageSelect} />
-            ) : (
-              <Navigate to="/signin" />
-            )
+            isLoggedIn ? <Language onNext={handleLanguageSelect} /> : <Navigate to="/signin" />
           }
         />
 
@@ -106,10 +98,7 @@ function App() {
           path="/select-genre"
           element={
             isLoggedIn ? (
-              <Genre
-                selectedLanguages={selectedLanguages}
-                onNext={handleGenreSelect}
-              />
+              <Genre selectedLanguages={selectedLanguages} onNext={handleGenreSelect} />
             ) : (
               <Navigate to="/signin" />
             )
@@ -129,7 +118,16 @@ function App() {
             />
             <Route path="/recommended" element={<Recommended userId={userId} />} />
             <Route path="/movies" element={<Movies />} />
-            <Route path="/my-profile" element={<MyProfile userId={userId} setIsLoggedIn={setIsLoggedIn} setFirstLogin={setFirstLogin} />} />
+            <Route
+              path="/my-profile"
+              element={
+                <MyProfile
+                  userId={userId}
+                  setIsLoggedIn={setIsLoggedIn}
+                  setFirstLogin={setFirstLogin}
+                />
+              }
+            />
           </>
         )}
 
