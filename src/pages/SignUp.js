@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../style/Auth.css";
 import { signupUser } from "../api";
+import "../style/Auth.css";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -26,23 +26,26 @@ function SignUp() {
     else if (!validatePassword(password))
       tempErrors.password =
         "Password must be 8+ chars, with uppercase, lowercase, number & symbol.";
-    if (!confirmPassword) tempErrors.confirmPassword = "Confirm your password.";
+    if (!confirmPassword)
+      tempErrors.confirmPassword = "Confirm your password.";
     else if (password !== confirmPassword)
       tempErrors.confirmPassword = "Passwords do not match.";
 
     setErrors(tempErrors);
-    if (Object.keys(tempErrors).length > 0) return;
 
-    try {
-      await signupUser({ name, email, password });
-      alert("Signup successful! Please login.");
-      navigate("/signin"); // Manual signup goes to login page
-    } catch (err) {
-      alert(err.message || "Signup failed.");
+    if (Object.keys(tempErrors).length === 0) {
+      try {
+        await signupUser({ name, email, password });
+        alert("Signup successful! Please login.");
+        navigate("/signin");
+      } catch (error) {
+        alert(error.message);
+      }
     }
   };
 
   const handleGoogleSignUp = () => {
+    // Redirect to backend Google OAuth (same tab)
     window.location.href = "https://flix-api-ty29.onrender.com/api/auth/google";
   };
 
@@ -52,7 +55,6 @@ function SignUp() {
       <div className="login-container">
         <div className="login-card">
           <div className="welcome-text">Sign Up</div>
-
           <form onSubmit={handleSubmit}>
             <div className="input-group">
               <span className="icon">👤</span>
@@ -84,7 +86,9 @@ function SignUp() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {errors.password && <small style={{ color: "red" }}>{errors.password}</small>}
+              {errors.password && (
+                <small style={{ color: "red" }}>{errors.password}</small>
+              )}
             </div>
 
             <div className="input-group">
@@ -95,7 +99,9 @@ function SignUp() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              {errors.confirmPassword && <small style={{ color: "red" }}>{errors.confirmPassword}</small>}
+              {errors.confirmPassword && (
+                <small style={{ color: "red" }}>{errors.confirmPassword}</small>
+              )}
             </div>
 
             <button type="submit" className="btn sign-in-btn">
@@ -119,3 +125,4 @@ function SignUp() {
 }
 
 export default SignUp;
+

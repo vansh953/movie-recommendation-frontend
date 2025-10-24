@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import "../style/Auth.css";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../api";
+import "../style/Auth.css";
 
 function SignIn({ onLogin }) {
   const navigate = useNavigate();
@@ -11,15 +11,16 @@ function SignIn({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
     try {
-      const user = await loginUser({ email, password });
-      onLogin(user);
-      if (user.firstLogin) navigate("/select-language");
-      else navigate("/home");
+      const data = await loginUser({ email, password });
+      onLogin(data.user._id); // set logged in user
+      if (data.user.firstLogin) {
+        navigate("/select-language");
+      } else {
+        navigate("/home");
+      }
     } catch (err) {
-      setError(err.message || "Login failed.");
+      setError(err.message);
     }
   };
 
@@ -29,7 +30,6 @@ function SignIn({ onLogin }) {
       <div className="login-container">
         <div className="login-card">
           <div className="welcome-text">Welcome Back</div>
-
           <form onSubmit={handleSubmit}>
             <div className="input-group">
               <span className="icon">📧</span>
@@ -38,10 +38,8 @@ function SignIn({ onLogin }) {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
             </div>
-
             <div className="input-group">
               <span className="icon">🔒</span>
               <input
@@ -49,17 +47,11 @@ function SignIn({ onLogin }) {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
             </div>
-
             {error && <small style={{ color: "red" }}>{error}</small>}
-
-            <button type="submit" className="btn sign-in-btn">
-              Sign In
-            </button>
+            <button type="submit" className="btn sign-in-btn">Sign In</button>
           </form>
-
           <div className="signup-prompt">
             New here? <Link to="/signup" className="signup-link">Sign Up</Link>
           </div>
