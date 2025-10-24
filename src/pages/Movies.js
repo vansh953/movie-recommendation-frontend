@@ -1,39 +1,91 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../style/Movies.css";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+function getYouTubeEmbedUrl(url) {
+  if (!url) return "";
+  try {
+    const videoUrl = new URL(url);
+    const videoId = videoUrl.searchParams.get("v");
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return url;
+  } catch (error) {
+    console.error("Invalid trailer URL:", error);
+    return "";
+  }
+}
 
 function Movies() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [movies, setMovies] = useState([]);
-  const [filteredMovies, setFilteredMovies] = useState([]);
-  const [featured, setFeatured] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [trailerUrl, setTrailerUrl] = useState("");
   const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const response = await fetch("/api/movies");
-        const data = await response.json();
-        setMovies(data);
-        setFilteredMovies(data);
-        setFeatured(data.slice(0, 8));
-      } catch (err) {
-        console.error(err);
+    if (searchTerm.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      setLoading(true);
+      setError(null);
+
+      axios
+        .get(`${API_BASE_URL}/api/movies/search?query=${searchTerm}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        })
+        .then((response) => {
+          setSearchResults(response.data);
+        })
+        .catch((err) => {
+          console.error("Search error:", err);
+          setError("Failed to fetch movies. Please try again.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  const handleMovieClick = async (movie) => {
+    if (!movie.trailer_link) {
+      alert("No trailer available for this movie.");
+      return;
+    }
+
+    const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
+
+    try {
+      if (API_BASE_URL) {
+        await axios.post(
+          `${API_BASE_URL}/api/user/history`,
+          { movieId: movie.id },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        console.log(`Added "${movie.title}" (ID: ${movie.id}) to watch history.`);
+      } else {
+        console.error("API Base URL not configured.");
       }
-    };
-    fetchMovies();
-  }, []);
+    } catch (e) {
+      console.error("Failed to save to watch history via API:", e.response?.data?.msg || e.message);
+    }
 
-  useEffect(() => {
-    setFilteredMovies(
-      movies.filter(movie =>
-        movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [searchTerm, movies]);
-
-  const handleMovieClick = (trailer) => {
-    setTrailerUrl(trailer);
+    setTrailerUrl(embedUrl);
     setShowTrailer(true);
   };
 
@@ -53,41 +105,38 @@ function Movies() {
         className="search-bar"
       />
 
-      <h2>🌟 Featured</h2>
-      <div className="featured-scroll">
-        {featured.map((movie) => (
-          <div
-            key={movie.id}
-            className="featured-card"
-            onClick={() => handleMovieClick(movie.trailer)}
-          >
-            <img src={movie.poster} alt={movie.title} />
-            <h4>{movie.title}</h4>
-          </div>
-        ))}
-      </div>
+      <h2>Search Results</h2>
 
-      <h2>All Movies</h2>
+      {loading && <p>Loading...</p>}
+      {error && <p className="error-message">{error}</p>}
+
       <div className="movies-list">
-        {filteredMovies.length > 0 ? (
-          filteredMovies.map((movie) => (
+        {!loading &&
+          !error &&
+          searchResults.length > 0 &&
+          searchResults.map((movie) => (
             <div
-              key={movie.id}
+              key={movie._id}
               className="movie-card"
-              onClick={() => handleMovieClick(movie.trailer)}
+              onClick={() => handleMovieClick(movie)}
             >
-              <img src={movie.poster} alt={movie.title} />
+              <img src={movie.poster_path} alt={movie.title} />
               <h3>{movie.title}</h3>
             </div>
-          ))
-        ) : (
-          <p>No movies found. (Please ensure your API is running and returning data.)</p>
+          ))}
+
+        {!loading && !error && searchResults.length === 0 && searchTerm.length > 0 && (
+          <p>No movies found matching "{searchTerm}".</p>
+        )}
+
+        {!loading && !error && searchResults.length === 0 && searchTerm.length === 0 && (
+          <p>Start typing to search for a movie.</p>
         )}
       </div>
 
       {showTrailer && (
         <div className="trailer-modal" onClick={closeTrailer}>
-          <div className="trailer-content" onClick={e => e.stopPropagation()}>
+          <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
             <iframe
               src={trailerUrl}
               title="Movie Trailer"
@@ -96,7 +145,9 @@ function Movies() {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
-            <button className="close-btn" onClick={closeTrailer}>✖</button>
+            <button className="close-btn" onClick={closeTrailer}>
+              ✖
+            </button>
           </div>
         </div>
       )}
