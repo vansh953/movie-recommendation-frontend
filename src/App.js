@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Language from "./pages/Language";
@@ -10,17 +12,36 @@ import Movies from "./pages/Movies";
 import Recommended from "./pages/Recommended";
 import MyProfile from "./pages/MyProfile";
 import Home from "./pages/Home"; 
-
+import AuthCallback from "./pages/AuthCallback"; 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [firstLogin, setFirstLogin] = useState(true);
+  const [firstLogin, setFirstLogin] = useState(true); 
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const [userId, setUserId] = useState(null); // <-- store logged-in user ID
+  const [userId, setUserId] = useState(null);
 
-  const handleLogin = (id) => {
-    setIsLoggedIn(true);
-    setUserId(id); // save userId after login
+  const handleLogin = (tokenOrId) => {
+    let id;
+    
+    if (typeof tokenOrId === 'string' && tokenOrId.length > 50) {
+        try {
+            const decodedToken = jwtDecode(tokenOrId);
+            id = decodedToken.id; 
+            localStorage.setItem('authToken', tokenOrId); 
+        } catch (e) {
+            console.error("Invalid token:", e);
+            return; 
+        }
+    } else if (tokenOrId) { 
+        id = tokenOrId;
+       
+    }
+
+    if (id) {
+        setIsLoggedIn(true);
+        setUserId(id);
+  
+    }
   };
 
   const handleLanguageSelect = (languages) => {
@@ -33,7 +54,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <>
       {isLoggedIn && !firstLogin && <Navbar1 />}
 
       <Routes>
@@ -54,7 +75,7 @@ function App() {
           path="/signin" 
           element={
             !isLoggedIn ? (
-              <SignIn onLogin={handleLogin} />
+              <SignIn onLogin={handleLogin} /> 
             ) : firstLogin ? (
               <Navigate to="/select-language" />
             ) : (
@@ -63,7 +84,12 @@ function App() {
           } 
         />
 
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />
+
+        <Route
+          path="/dashboard"
+          element={<AuthCallback onLogin={handleLogin} />}
+        />
 
         <Route
           path="/select-language"
@@ -109,7 +135,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </Router>
+    </>
   );
 }
 

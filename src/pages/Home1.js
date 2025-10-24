@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../style/Home1.css";
 
 import M1 from "../assets/M1.jpg";
@@ -58,7 +58,6 @@ function Home1() {
     }, 500);
   };
 
-  // Bookmark handler
   const handleBookmark = (movie) => {
     const stored = JSON.parse(localStorage.getItem("bookmarkedMovies")) || [];
     if (!stored.find((m) => m.title === movie.title)) {
@@ -68,6 +67,18 @@ function Home1() {
     } else {
       alert(`${movie.title} is already bookmarked.`);
     }
+  };
+
+  const handlePlayTrailer = (movie) => {
+    setShowTrailer(true);
+    setSelectedMovie(movie);
+
+    // Add to watch history in localStorage
+    const history = JSON.parse(localStorage.getItem("watchHistory")) || [];
+    // Remove duplicate if exists
+    const filtered = history.filter((m) => m.title !== movie.title);
+    filtered.push(movie); // push latest at the end
+    localStorage.setItem("watchHistory", JSON.stringify(filtered));
   };
 
   return (
@@ -100,7 +111,7 @@ function Home1() {
             <p>{selectedMovie.longDesc}</p>
 
             {!showTrailer ? (
-              <button className="play-btn" onClick={() => setShowTrailer(true)}>
+              <button className="play-btn" onClick={() => handlePlayTrailer(selectedMovie)}>
                 ▶ Play Trailer
               </button>
             ) : (
@@ -116,7 +127,6 @@ function Home1() {
               </div>
             )}
 
-            {/* Bookmark button */}
             <button className="bookmark-btn" onClick={() => handleBookmark(selectedMovie)}>
               ★ Bookmark
             </button>
@@ -132,4 +142,3 @@ function Home1() {
 }
 
 export default Home1;
-
