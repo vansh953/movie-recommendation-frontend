@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import jwtDecode from "jwt-decode"; // fixed import
+import { jwtDecode } from "jwt-decode";
+
 
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
