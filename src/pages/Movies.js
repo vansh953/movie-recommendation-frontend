@@ -29,7 +29,7 @@ function Movies() {
       setSearchResults([]);
       return;
     }
-    const delay = setTimeout(() => {
+    const delayDebounceFn = setTimeout(() => {
       setLoading(true);
       setError(null);
       axios
@@ -40,7 +40,7 @@ function Movies() {
         .catch(() => setError("Failed to fetch movies."))
         .finally(() => setLoading(false));
     }, 500);
-    return () => clearTimeout(delay);
+    return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
   const handleMovieClick = async (movie) => {
@@ -83,20 +83,17 @@ function Movies() {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="search-bar"
       />
-      {loading && <p>Loading...</p>}
-      {error && <p className="error-message">{error}</p>}
+      {loading && <p className="status-text">Loading...</p>}
+      {error && <p className="status-text error">{error}</p>}
       <div className="movies-list">
         {searchResults.map((movie) => (
           <div key={movie._id || movie.id} className="movie-card">
             <img src={movie.poster_path} alt={movie.title} onClick={() => handleMovieClick(movie)} />
             <h3>{movie.title}</h3>
-            <button onClick={(e) => { e.stopPropagation(); handleBookmark(movie); }} className="bookmark-btn">
-              🔖 Bookmark
-            </button>
+            <button className="bookmark-btn" onClick={(e) => { e.stopPropagation(); handleBookmark(movie); }}>🔖 Bookmark</button>
           </div>
         ))}
-        {!loading && !error && searchResults.length === 0 && searchTerm && <p>No movies found for "{searchTerm}".</p>}
-        {!loading && !error && !searchTerm && <p>Start typing to search movies.</p>}
+        {!loading && !error && searchResults.length === 0 && searchTerm && <p className="status-text">No movies found matching "{searchTerm}".</p>}
       </div>
       {showTrailer && (
         <div className="trailer-modal" onClick={closeTrailer}>
@@ -104,6 +101,8 @@ function Movies() {
             <iframe
               src={trailerUrl}
               title="Movie Trailer"
+              width="100%"
+              height="100%"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>

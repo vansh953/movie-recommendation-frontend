@@ -1,4 +1,3 @@
-
 .navbar1 {
   position: fixed;
   top: 0;
@@ -39,16 +38,8 @@
   color: #fff;
   border-bottom: 2px solid #ff4c29;
 }
-@media (max-width: 768px) {
-  .navbar1 {
-    flex-direction: column;
-    height: auto;
-    padding: 1rem;
-  }
 
-  .navbar-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-  }
+@media (max-width: 768px) {
+  .navbar1 { flex-direction: column; height: auto; padding: 1rem; }
+  .navbar-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
 }
