@@ -9,9 +9,7 @@ function getYouTubeEmbedUrl(url) {
   try {
     const videoUrl = new URL(url);
     const videoId = videoUrl.searchParams.get("v");
-    if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}`;
-    }
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return url;
   } catch (error) {
     console.error("Invalid trailer URL:", error);
@@ -43,26 +41,16 @@ function Movies() {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         })
-        .then((response) => {
-          setSearchResults(response.data);
-        })
-        .catch((err) => {
-          console.error("Search error:", err);
-          setError("Failed to fetch movies. Please try again.");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+        .then((response) => setSearchResults(response.data))
+        .catch(() => setError("Failed to fetch movies. Please try again."))
+        .finally(() => setLoading(false));
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
   const handleMovieClick = async (movie) => {
-    if (!movie.trailer_link) {
-      alert("No trailer available for this movie.");
-      return;
-    }
+    if (!movie.trailer_link) return;
 
     const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
 
@@ -77,16 +65,29 @@ function Movies() {
             },
           }
         );
-        console.log(`Added "${movie.title}" (ID: ${movie.id}) to watch history.`);
-      } else {
-        console.error("API Base URL not configured.");
+        window.dispatchEvent(new Event("watchHistoryUpdated"));
       }
     } catch (e) {
-      console.error("Failed to save to watch history via API:", e.response?.data?.msg || e.message);
+      console.error("Failed to save to watch history:", e.response?.data?.msg || e.message);
     }
 
     setTrailerUrl(embedUrl);
     setShowTrailer(true);
+  };
+
+  const handleBookmark = async (movie) => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/api/user/bookmark`,
+        { movieId: movie.id },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
+        }
+      );
+      alert(`"${movie.title}" added to bookmarks!`);
+    } catch (e) {
+      console.error("Failed to add bookmark:", e.response?.data?.msg || e.message);
+    }
   };
 
   const closeTrailer = () => {
@@ -115,13 +116,18 @@ function Movies() {
           !error &&
           searchResults.length > 0 &&
           searchResults.map((movie) => (
-            <div
-              key={movie._id}
-              className="movie-card"
-              onClick={() => handleMovieClick(movie)}
-            >
-              <img src={movie.poster_path} alt={movie.title} />
+            <div key={movie._id || movie.id} className="movie-card">
+              <img src={movie.poster_path} alt={movie.title} onClick={() => handleMovieClick(movie)} />
               <h3>{movie.title}</h3>
+              <button
+                className="bookmark-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleBookmark(movie);
+                }}
+              >
+                🔖 Bookmark
+              </button>
             </div>
           ))}
 
