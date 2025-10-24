@@ -11,8 +11,7 @@ function getYouTubeEmbedUrl(url) {
     const videoId = videoUrl.searchParams.get("v");
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return url;
-  } catch (error) {
-    console.error("Invalid trailer URL:", error);
+  } catch {
     return "";
   }
 }
@@ -26,51 +25,35 @@ function Movies() {
   const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (!searchTerm.trim()) {
       setSearchResults([]);
       return;
     }
-
-    const delayDebounceFn = setTimeout(() => {
+    const delay = setTimeout(() => {
       setLoading(true);
       setError(null);
-
       axios
         .get(`${API_BASE_URL}/api/movies/search?query=${searchTerm}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
         })
-        .then((response) => setSearchResults(response.data))
-        .catch(() => setError("Failed to fetch movies. Please try again."))
+        .then((res) => setSearchResults(res.data))
+        .catch(() => setError("Failed to fetch movies."))
         .finally(() => setLoading(false));
     }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
+    return () => clearTimeout(delay);
   }, [searchTerm]);
 
   const handleMovieClick = async (movie) => {
     if (!movie.trailer_link) return;
-
     const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
-
     try {
-      if (API_BASE_URL) {
-        await axios.post(
-          `${API_BASE_URL}/api/user/history`,
-          { movieId: movie.id },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        window.dispatchEvent(new Event("watchHistoryUpdated"));
-      }
-    } catch (e) {
-      console.error("Failed to save to watch history:", e.response?.data?.msg || e.message);
-    }
-
+      await axios.post(
+        `${API_BASE_URL}/api/user/history`,
+        { movieId: movie.id },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
+      );
+      window.dispatchEvent(new Event("watchHistoryUpdated"));
+    } catch {}
     setTrailerUrl(embedUrl);
     setShowTrailer(true);
   };
@@ -80,14 +63,9 @@ function Movies() {
       await axios.post(
         `${API_BASE_URL}/api/user/bookmark`,
         { movieId: movie.id },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
-        }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
       );
-      alert(`"${movie.title}" added to bookmarks!`);
-    } catch (e) {
-      console.error("Failed to add bookmark:", e.response?.data?.msg || e.message);
-    }
+    } catch {}
   };
 
   const closeTrailer = () => {
@@ -105,55 +83,31 @@ function Movies() {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="search-bar"
       />
-
-      <h2>Search Results</h2>
-
       {loading && <p>Loading...</p>}
       {error && <p className="error-message">{error}</p>}
-
       <div className="movies-list">
-        {!loading &&
-          !error &&
-          searchResults.length > 0 &&
-          searchResults.map((movie) => (
-            <div key={movie._id || movie.id} className="movie-card">
-              <img src={movie.poster_path} alt={movie.title} onClick={() => handleMovieClick(movie)} />
-              <h3>{movie.title}</h3>
-              <button
-                className="bookmark-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleBookmark(movie);
-                }}
-              >
-                🔖 Bookmark
-              </button>
-            </div>
-          ))}
-
-        {!loading && !error && searchResults.length === 0 && searchTerm.length > 0 && (
-          <p>No movies found matching "{searchTerm}".</p>
-        )}
-
-        {!loading && !error && searchResults.length === 0 && searchTerm.length === 0 && (
-          <p>Start typing to search for a movie.</p>
-        )}
+        {searchResults.map((movie) => (
+          <div key={movie._id || movie.id} className="movie-card">
+            <img src={movie.poster_path} alt={movie.title} onClick={() => handleMovieClick(movie)} />
+            <h3>{movie.title}</h3>
+            <button onClick={(e) => { e.stopPropagation(); handleBookmark(movie); }} className="bookmark-btn">
+              🔖 Bookmark
+            </button>
+          </div>
+        ))}
+        {!loading && !error && searchResults.length === 0 && searchTerm && <p>No movies found for "{searchTerm}".</p>}
+        {!loading && !error && !searchTerm && <p>Start typing to search movies.</p>}
       </div>
-
       {showTrailer && (
         <div className="trailer-modal" onClick={closeTrailer}>
           <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
             <iframe
               src={trailerUrl}
               title="Movie Trailer"
-              width="100%"
-              height="100%"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
-            <button className="close-btn" onClick={closeTrailer}>
-              ✖
-            </button>
+            <button className="close-btn" onClick={closeTrailer}>✖</button>
           </div>
         </div>
       )}
