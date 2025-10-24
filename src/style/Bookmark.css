@@ -1,0 +1,54 @@
+.bookmark-page {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  padding: 80px 20px 20px 20px;
+  background: #0d0d0d;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+.bookmark-page h1 {
+  color: #ff3b3f;
+  margin-bottom: 20px;
+}
+
+.movies-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.movie-card {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 59, 63, 0.5);
+}
+
+.movie-card img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+.movie-card h3 {
+  padding: 8px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .movies-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .movie-card img {
+    height: 200px;
+  }
+}

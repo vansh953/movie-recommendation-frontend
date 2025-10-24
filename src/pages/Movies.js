@@ -10,108 +10,121 @@ function getYouTubeEmbedUrl(url) {
     const videoUrl = new URL(url);
     const videoId = videoUrl.searchParams.get("v");
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    if (url.includes("youtube.com/embed/")) return url;
     return url;
   } catch {
     return "";
   }
 }
 
-function Movies() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [trailerUrl, setTrailerUrl] = useState("");
-  const [showTrailer, setShowTrailer] = useState(false);
+const addToWatchHistoryAPI = async (movieId) => {
+  if (!movieId) return;
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+    await axios.post(
+      `${API_BASE_URL}/api/user/history`,
+      { movieId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch {}
+};
+
+const Movies = () => {
+  const [movies, setMovies] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    const delayDebounceFn = setTimeout(() => {
-      setLoading(true);
-      setError(null);
-      axios
-        .get(`${API_BASE_URL}/api/movies/search?query=${searchTerm}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
-        })
-        .then((res) => setSearchResults(res.data))
-        .catch(() => setError("Failed to fetch movies."))
-        .finally(() => setLoading(false));
-    }, 500);
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
 
-  const handleMovieClick = async (movie) => {
-    if (!movie.trailer_link) return;
-    const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
-    try {
-      await axios.post(
-        `${API_BASE_URL}/api/user/history`,
-        { movieId: movie.id },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
-      );
-      window.dispatchEvent(new Event("watchHistoryUpdated"));
-    } catch {}
-    setTrailerUrl(embedUrl);
-    setShowTrailer(true);
+    axios
+      .get(`${API_BASE_URL}/api/movies`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setMovies(res.data || []))
+      .catch(() => setMovies([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredMovies = movies.filter((m) =>
+    m.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleMovieClick = (movie) => {
+    setSelectedMovie(movie);
+    addToWatchHistoryAPI(movie.id);
   };
 
-  const handleBookmark = async (movie) => {
-    try {
-      await axios.post(
-        `${API_BASE_URL}/api/user/bookmark`,
-        { movieId: movie.id },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
-      );
-    } catch {}
-  };
-
-  const closeTrailer = () => {
-    setShowTrailer(false);
-    setTrailerUrl("");
-  };
+  const handleCloseModal = () => setSelectedMovie(null);
 
   return (
     <div className="movies-page">
-      <h1>🎞️ Movies</h1>
+      <h1>Movies</h1>
       <input
         type="text"
-        placeholder="Search movies..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
         className="search-bar"
+        placeholder="Search movies..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
       />
-      {loading && <p className="status-text">Loading...</p>}
-      {error && <p className="status-text error">{error}</p>}
-      <div className="movies-list">
-        {searchResults.map((movie) => (
-          <div key={movie._id || movie.id} className="movie-card">
-            <img src={movie.poster_path} alt={movie.title} onClick={() => handleMovieClick(movie)} />
-            <h3>{movie.title}</h3>
-            <button className="bookmark-btn" onClick={(e) => { e.stopPropagation(); handleBookmark(movie); }}>🔖 Bookmark</button>
-          </div>
-        ))}
-        {!loading && !error && searchResults.length === 0 && searchTerm && <p className="status-text">No movies found matching "{searchTerm}".</p>}
-      </div>
-      {showTrailer && (
-        <div className="trailer-modal" onClick={closeTrailer}>
-          <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
-            <iframe
-              src={trailerUrl}
-              title="Movie Trailer"
-              width="100%"
-              height="100%"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-            <button className="close-btn" onClick={closeTrailer}>✖</button>
+
+      {loading ? (
+        <p>Loading movies...</p>
+      ) : filteredMovies.length === 0 ? (
+        <p>No movies found</p>
+      ) : (
+        <div className="movies-list">
+          {filteredMovies.map((movie) => (
+            <div
+              key={movie.id || movie._id}
+              className="movie-card"
+              onClick={() => handleMovieClick(movie)}
+            >
+              <img
+                src={movie.poster_path}
+                alt={movie.title}
+                onError={(e) =>
+                  (e.target.src =
+                    "https://placehold.co/200x300/111/FFF?text=No+Image")
+                }
+              />
+              <h3>{movie.title}</h3>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedMovie && (
+        <div className="trailer-modal" onClick={handleCloseModal}>
+          <div
+            className="trailer-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>{selectedMovie.title}</h2>
+            {getYouTubeEmbedUrl(selectedMovie.trailer_link) ? (
+              <iframe
+                src={getYouTubeEmbedUrl(selectedMovie.trailer_link)}
+                title={`${selectedMovie.title} Trailer`}
+                width="100%"
+                height="80%"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ border: "none", marginBottom: "10px" }}
+              ></iframe>
+            ) : (
+              <p>No trailer available.</p>
+            )}
+            <button className="close-btn" onClick={handleCloseModal}>
+              ✖ Close
+            </button>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
 
 export default Movies;
