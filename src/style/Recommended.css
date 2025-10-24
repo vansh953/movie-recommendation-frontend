@@ -1,36 +1,23 @@
-.movies-page {
+.recommended-page {
   width: 100%;
   min-height: calc(100vh - 65px);
   padding: 80px 20px 20px 20px;
   box-sizing: border-box;
-  background-color: #0f0f0f;
+  background-color: #0d0d0d;
   color: #fff;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
-.movies-page h1 {
+.recommended-page h1 {
+  color: #ff3b3f;
   font-size: 2rem;
   margin-bottom: 20px;
-  color: #ff4c00;
   text-align: center;
 }
 
-.search-bar {
-  width: 100%;
-  max-width: 600px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  margin: 0 auto 30px auto;
-  display: block;
-  background-color: #1a1a1a;
-  color: #fff;
-}
-
-.search-bar::placeholder {
-  color: #aaa;
+.error-message {
+  color: red;
+  text-align: center;
 }
 
 .movies-list {
@@ -44,6 +31,7 @@
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
+  position: relative;
   transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
@@ -52,7 +40,7 @@
 
 .movie-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(255, 76, 0, 0.5);
+  box-shadow: 0 8px 20px rgba(255, 59, 63, 0.4);
 }
 
 .movie-card img {
@@ -64,9 +52,9 @@
 }
 
 .movie-card h3 {
-  padding: 10px 5px;
-  text-align: center;
+  margin: 10px;
   font-size: 1rem;
+  text-align: center;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -109,16 +97,25 @@
 .trailer-content {
   position: relative;
   width: 90%;
-  max-width: 1000px;
+  max-width: 900px;
   aspect-ratio: 16/9;
-  background: #000;
+  background: #181818;
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255, 59, 63, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.trailer-content h2 {
+  color: #ff3b3f;
+  text-align: center;
+  margin: 10px 0;
 }
 
 .trailer-content iframe {
-  width: 100%;
-  height: 100%;
+  flex: 1;
   border: none;
 }
 
@@ -140,10 +137,10 @@
 }
 
 @media (max-width: 768px) {
-  .movies-page {
+  .recommended-page {
     padding-top: 100px;
   }
-  .movies-page h1 {
+  .recommended-page h1 {
     font-size: 1.5rem;
   }
   .movie-card img {
