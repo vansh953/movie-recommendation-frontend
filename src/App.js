@@ -212,7 +212,7 @@ function App() {
         {/* Render SignUp only if not logged in */}
         {!isLoggedIn && <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />}
         {/* Google Auth Callback */}
-        <Route path="/dashboard" element={<AuthCallback onLogin={handleLogin} />} />
+        <Route path="/dashboard" element={<AuthCallBack onLogin={handleLogin} />} />
 
         {/* --- Protected Routes --- */}
         {isLoggedIn ? (
