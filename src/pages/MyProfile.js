@@ -1,87 +1,165 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../style/MyProfile.css";
 
-function MyProfile({ setIsLoggedIn, setFirstLogin }) {
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const PROFILE_API_URL = `${API_BASE_URL}/api/user/profile`;
+
+function MyProfile({ userId, setIsLoggedIn, setFirstLogin, onLogout }) {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [saveError, setSaveError] = useState(null);
 
   const [profile, setProfile] = useState({
     name: "",
     email: "",
+    profilePic: "",
     mobile: "",
     gender: "",
-    languages: "",
-    genres: "",
     favoriteActor: "",
     favoriteDirector: "",
     dob: "",
+    genres: [],
+    preferredLanguage: "",
   });
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem("userProfile");
-    const selectedGender = localStorage.getItem("selectedGender");
-    const selectedLanguages = localStorage.getItem("selectedLanguages");
-    const selectedGenres = localStorage.getItem("selectedGenres");
+    setLoading(true);
+    setError(null);
+    const token = localStorage.getItem("authToken");
 
-    if (savedProfile) {
-      const parsedProfile = JSON.parse(savedProfile);
-      parsedProfile.gender = selectedGender || parsedProfile.gender || "";
-      parsedProfile.languages = selectedLanguages || parsedProfile.languages || "";
-      parsedProfile.genres = selectedGenres || parsedProfile.genres || "";
-      setProfile(parsedProfile);
-    } else {
-      const userEmail = localStorage.getItem("userEmail") || "";
-      setProfile({
-        name: "",
-        email: userEmail,
-        mobile: "",
-        gender: selectedGender || "",
-        languages: selectedLanguages || "",
-        genres: selectedGenres || "",
-        favoriteActor: "",
-        favoriteDirector: "",
-        dob: "",
-      });
+    if (!token) {
+      setError("Not authenticated. Please log in.");
+      setLoading(false);
+      navigate("/signin");
+      return;
     }
-  }, []);
+    if (!API_BASE_URL) {
+      setError("API URL configuration error.");
+      setLoading(false);
+      return;
+    }
+
+    axios
+      .get(PROFILE_API_URL, { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => {
+        const fetchedProfile = response.data;
+        setProfile((prev) => ({
+          ...prev,
+          name: fetchedProfile.name || "",
+          email: fetchedProfile.email || "",
+          profilePic: fetchedProfile.profilePic || "",
+          genres: fetchedProfile.genres || [],
+          preferredLanguage: fetchedProfile.preferredLanguage || "",
+        }));
+      })
+      .catch((err) => {
+        console.error("Error fetching profile:", err.response || err);
+        setError("Failed to load profile data.");
+        if (err.response?.status === 401) {
+          handleLogout();
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
-    if (name === "gender") {
-      localStorage.setItem("selectedGender", value);
-    }
   };
 
-  const handleEditToggle = () => {
+  const handleEditToggle = async () => {
     if (isEditing) {
-      localStorage.setItem("userProfile", JSON.stringify(profile));
-      localStorage.setItem("selectedGender", profile.gender);
+      setLoading(true);
+      setSaveError(null);
+      const token = localStorage.getItem("authToken");
+      if (!token || !API_BASE_URL) {
+        setSaveError("Configuration or authentication error.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const genresArray =
+          typeof profile.genres === "string"
+            ? profile.genres
+                .split(",")
+                .map((g) => g.trim())
+                .filter((g) => g)
+            : profile.genres;
+
+        const updateData = {
+          name: profile.name,
+          genres: genresArray,
+          preferredLanguage: profile.preferredLanguage,
+          profilePic: profile.profilePic,
+        };
+
+        const response = await axios.put(PROFILE_API_URL, updateData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const updatedProfile = response.data;
+        setProfile((prev) => ({
+          ...prev,
+          name: updatedProfile.name || "",
+          email: updatedProfile.email || prev.email,
+          profilePic: updatedProfile.profilePic || "",
+          genres: updatedProfile.genres || [],
+          preferredLanguage: updatedProfile.preferredLanguage || "",
+        }));
+
+        setIsEditing(false);
+      } catch (err) {
+        console.error("Error saving profile:", err.response || err);
+        setSaveError(err.response?.data?.msg || "Failed to save profile. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setIsEditing(true);
     }
-    setIsEditing(!isEditing);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("userEmail");
-    setIsLoggedIn(false);
-    setFirstLogin(true);
-    navigate("/");
+    if (onLogout) {
+      onLogout();
+    } else {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userProfile");
+      localStorage.removeItem("selectedGender");
+      localStorage.removeItem("selectedLanguages");
+      localStorage.removeItem("selectedGenres");
+      setIsLoggedIn(false);
+      setFirstLogin(true);
+      navigate("/");
+    }
   };
 
-  const formatDOB = (dob) => {
-    if (!dob) return "Not specified";
-    const dateObj = new Date(dob);
-    const day = String(dateObj.getDate()).padStart(2, "0");
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-    const year = dateObj.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+  if (loading && !profile.email) {
+    return (
+      <div className="profile-container">
+        <p style={{ color: "white" }}>Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <p className="error-message">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
       <div className="profile-card">
         <h1>My Profile</h1>
+        {saveError && <p className="error-message" style={{ textAlign: "center" }}>{saveError}</p>}
         <div className="profile-info">
           <div className="profile-field">
             <label>Name:</label>
@@ -91,79 +169,44 @@ function MyProfile({ setIsLoggedIn, setFirstLogin }) {
               <span>{profile.name || "Not provided"}</span>
             )}
           </div>
+
           <div className="profile-field">
             <label>Email:</label>
-            {isEditing ? (
-              <input type="email" name="email" value={profile.email} onChange={handleChange} placeholder="Enter your email" />
-            ) : (
-              <span>{profile.email || "Not provided"}</span>
-            )}
+            <span>{profile.email || "Not provided"}</span>
           </div>
+
           <div className="profile-field">
-            <label>Gender:</label>
+            <label>Preferred Language:</label>
             {isEditing ? (
-              <select name="gender" value={profile.gender} onChange={handleChange}>
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
+              <input type="text" name="preferredLanguage" value={profile.preferredLanguage} onChange={handleChange} placeholder="e.g., English" />
             ) : (
-              <span>{profile.gender || "Not specified"}</span>
+              <span>{profile.preferredLanguage || "Not specified"}</span>
             )}
           </div>
-          <div className="profile-field">
-            <label>Preferred Languages:</label>
-            {isEditing ? (
-              <input type="text" name="languages" value={profile.languages} onChange={handleChange} placeholder="Enter preferred languages" />
-            ) : (
-              <span>{profile.languages || "Not specified"}</span>
-            )}
-          </div>
+
           <div className="profile-field">
             <label>Favorite Genres:</label>
             {isEditing ? (
-              <input type="text" name="genres" value={profile.genres} onChange={handleChange} placeholder="Enter favorite genres" />
+              <input
+                type="text"
+                name="genres"
+                value={Array.isArray(profile.genres) ? profile.genres.join(", ") : profile.genres}
+                onChange={handleChange}
+                placeholder="e.g., Action, Comedy, Drama"
+              />
             ) : (
-              <span>{profile.genres || "Not specified"}</span>
-            )}
-          </div>
-          <div className="profile-field">
-            <label>Mobile Number:</label>
-            {isEditing ? (
-              <input type="text" name="mobile" value={profile.mobile} onChange={handleChange} placeholder="Enter your mobile number" />
-            ) : (
-              <span>{profile.mobile || "Not provided"}</span>
-            )}
-          </div>
-          <div className="profile-field">
-            <label>Favorite Actor:</label>
-            {isEditing ? (
-              <input type="text" name="favoriteActor" value={profile.favoriteActor} onChange={handleChange} placeholder="Enter favorite actor" />
-            ) : (
-              <span>{profile.favoriteActor || "Not specified"}</span>
-            )}
-          </div>
-          <div className="profile-field">
-            <label>Favorite Director:</label>
-            {isEditing ? (
-              <input type="text" name="favoriteDirector" value={profile.favoriteDirector} onChange={handleChange} placeholder="Enter favorite director" />
-            ) : (
-              <span>{profile.favoriteDirector || "Not specified"}</span>
-            )}
-          </div>
-          <div className="profile-field">
-            <label>Date of Birth:</label>
-            {isEditing ? (
-              <input type="date" name="dob" value={profile.dob} onChange={handleChange} />
-            ) : (
-              <span>{formatDOB(profile.dob)}</span>
+              <span>{Array.isArray(profile.genres) && profile.genres.length > 0 ? profile.genres.join(", ") : "Not specified"}</span>
             )}
           </div>
         </div>
+
         <div className="profile-buttons">
-          <button onClick={handleEditToggle}>{isEditing ? "Save Profile" : "Edit Profile"}</button>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          <button onClick={handleEditToggle} disabled={loading}>
+            {isEditing ? (loading ? "Saving..." : "Save Profile") : "Edit Profile"}
+          </button>
+          <button className="logout-btn" onClick={handleLogout} disabled={loading}>
+            Logout
+          </button>
         </div>
       </div>
     </div>
