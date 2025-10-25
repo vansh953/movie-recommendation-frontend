@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
-// Page Imports
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Language from "./pages/Language";
@@ -16,7 +15,7 @@ import MyProfile from "./pages/MyProfile";
 import Bookmarks from "./pages/Bookmarks";
 import WatchHistory from "./pages/WatchHistory";
 import Home from "./pages/Home";
-import AuthCallBack from "./pages/AuthCallBack"; 
+import AuthCallBack from "./pages/AuthCallback"; 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function App() {
