@@ -10,14 +10,9 @@ function getYouTubeEmbedUrl(url) {
   try {
     const videoUrl = new URL(url);
     const videoId = videoUrl.searchParams.get("v");
-    if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}`;
-    }
-    if (url.includes("youtu.be/")) {
-      const id = url.split("youtu.be/")[1];
-      return `https://www.youtube.com/embed/${id}`;
-    }
-    return "";
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    if (url.includes("youtube.com/embed/")) return url;
+    return url;
   } catch {
     return "";
   }
@@ -31,16 +26,16 @@ const addBookmarkAPI = async (movieToAdd) => {
   try {
     const token = localStorage.getItem("authToken");
     if (!token) throw new Error("No auth token.");
-    const response = await axios.post(
+    await axios.post(
       BOOKMARK_API_URL,
       { movieId: Number(movieToAdd.id) },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    alert(`"${movieToAdd.title}" added to bookmarks!`);
+    alert(`${movieToAdd.title}" added to bookmarks!`);
     return true;
   } catch (error) {
     if (error.response?.data?.msg === "Movie already bookmarked") {
-      alert(`"${movieToAdd.title}" is already in your bookmarks.`);
+      alert(`${movieToAdd.title}" is already in your bookmarks.`);
     } else {
       alert("Failed to add bookmark. Please try again.");
     }
@@ -53,7 +48,7 @@ function WatchHistory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [showTrailerInModal, setShowTrailerInModal] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState("");
 
   useEffect(() => {
@@ -70,153 +65,193 @@ function WatchHistory() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleMovieSelect = (movie) => {
+  useEffect(() => {
+    const styles = `
+      .recommendations-page {
+        padding: 20px;
+        padding-top: 80px;
+        color: white;
+        background-color: #0d0d0d;
+        min-height: calc(100vh - 70px);
+      }
+      .recommendations-page h1 {
+        color: #ff3b3f;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .error-message {
+        color: red;
+        text-align: center;
+      }
+      .movies-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 25px;
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .movie-card {
+        aspect-ratio: 2 / 3;
+        height: auto;
+        cursor: pointer;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        background-color: #1a1a1a;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .movie-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(255, 59, 63, 0.3);
+      }
+      .movie-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .movie-card h3 {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        padding: 10px;
+        font-size: 0.9em;
+        text-align: center;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    `;
+    const styleId = "recommendations-styles";
+    if (!document.getElementById(styleId)) {
+      const newStyleSheet = document.createElement("style");
+      newStyleSheet.id = styleId;
+      newStyleSheet.type = "text/css";
+      newStyleSheet.innerText = styles;
+      document.head.appendChild(newStyleSheet);
+    }
+  }, []);
+
+  const handleMovieClick = (movie) => {
     if (!movie) return;
-    setSelectedMovie(movie);
     const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
-    setTrailerUrl(embedUrl);
-    setShowTrailerInModal(false);
+    setSelectedMovie(movie);
+    setShowTrailer(true);
+    setTrailerUrl(embedUrl || "");
   };
 
-  const handleClose = () => {
+  const handleCloseModal = () => {
     setSelectedMovie(null);
+    setShowTrailer(false);
     setTrailerUrl("");
-    setShowTrailerInModal(false);
   };
 
-  if (selectedMovie) {
+  if (loading) {
     return (
-      <div className="movie-detail-container-overlay" onClick={handleClose}>
-        <div className="movie-detail-card" onClick={(e) => e.stopPropagation()}>
-          <div className="movie-detail-image-container">
-            <img
-              src={selectedMovie.poster_path}
-              alt={selectedMovie.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/400x600/111/FFF?text=No+Image";
-              }}
-            />
-          </div>
-          <div className="movie-detail-info-container">
-            <h2
-              style={{
-                fontSize: "2.5em",
-                color: "#ff3b3f",
-                marginBottom: "20px",
-              }}
-            >
-              {selectedMovie.title}
-            </h2>
-            <p
-              style={{
-                fontSize: "1.2em",
-                lineHeight: "1.6",
-                marginBottom: "30px",
-                maxHeight: "220px",
-                overflowY: "auto",
-              }}
-            >
-              {selectedMovie.description || "No description available."}
-            </p>
-
-            {!showTrailerInModal && trailerUrl && (
-              <button
-                className="play-trailer-button"
-                onClick={() => setShowTrailerInModal(true)}
-              >
-                ▶ Play Trailer
-              </button>
-            )}
-
-            {showTrailerInModal && trailerUrl && (
-              <div
-                style={{
-                  position: "relative",
-                  paddingBottom: "56.25%",
-                  height: 0,
-                  marginBottom: "15px",
-                  backgroundColor: "#000",
-                }}
-              >
-                <iframe
-                  src={trailerUrl}
-                  title={selectedMovie.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                ></iframe>
-              </div>
-            )}
-
-            {!trailerUrl && <p style={{ marginBottom: "15px" }}>No trailer available.</p>}
-
-            <button
-              className="add-bookmark-button"
-              onClick={() => addBookmarkAPI(selectedMovie)}
-            >
-              🔖 Add to Bookmarks
-            </button>
-
-            <button className="close-detail-button" onClick={handleClose}>
-              Close
-            </button>
-          </div>
-        </div>
+      <div className="recommendations-page">
+        <h1>⭐ Watch History</h1>
+        <p style={{ textAlign: "center", color: "grey" }}>Loading history...</p>
       </div>
     );
   }
 
-  if (loading)
-    return <p style={{ color: "#fff", textAlign: "center" }}>Loading...</p>;
-
-  if (error)
-    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
+  if (error) {
+    return (
+      <div className="recommendations-page">
+        <h1>⭐ Watch History</h1>
+        <p className="error-message">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="watch-history-page">
-      <h2 style={{ color: "#ff3b3f", marginBottom: "20px" }}>Watch History</h2>
+    <div className="recommendations-page">
+      <h1>⭐ Watch History</h1>
       {history.length === 0 ? (
-        <p style={{ color: "#fff" }}>No movies watched yet!</p>
+        <p style={{ color: "grey", textAlign: "center" }}>
+          No movies watched yet!
+        </p>
       ) : (
-        <div className="history-grid">
+        <div className="movies-list">
           {history.map((movie) =>
             movie ? (
               <div
                 key={movie._id || movie.id}
-                className="history-movie-card"
-                onClick={() => handleMovieSelect(movie)}
+                className="movie-card"
+                onClick={() => handleMovieClick(movie)}
               >
                 <img
                   src={movie.poster_path}
                   alt={movie.title}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src =
-                      "https://placehold.co/150x225/1a1a1a/FFF?text=No+Image";
+                      "https://placehold.co/200x300/1a1a1a/FFF?text=No+Image";
                   }}
                 />
-                <div className="history-title-overlay">
-                  <h3 style={{ margin: 0 }}>{movie.title}</h3>
-                </div>
+                <h3>{movie.title}</h3>
               </div>
             ) : null
           )}
+        </div>
+      )}
+
+      {showTrailer && selectedMovie && (
+        <div className="trailer-modal" onClick={handleCloseModal}>
+          <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
+            <h2>{selectedMovie.title}</h2>
+            {trailerUrl ? (
+              <iframe
+                src={trailerUrl}
+                title={`${selectedMovie.title} Trailer`}
+                width="100%"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  border: "none",
+                  marginBottom: "15px",
+                  flexGrow: 1,
+                }}
+              ></iframe>
+            ) : (
+              <p
+                style={{
+                  flexGrow: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ccc",
+                }}
+              >
+                No trailer available.
+              </p>
+            )}
+            <button
+              className="add-bookmark-button"
+              onClick={() => addBookmarkAPI(selectedMovie)}
+              style={{
+                background: "linear-gradient(45deg, #1e90ff, #4169e1)",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                alignSelf: "center",
+                marginBottom: "10px",
+              }}
+            >
+              🔖 Add to Bookmarks
+            </button>
+            <button className="close-btn" onClick={handleCloseModal}>
+              ✖
+            </button>
+          </div>
         </div>
       )}
     </div>
