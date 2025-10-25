@@ -15,7 +15,6 @@ import MyProfile from "./pages/MyProfile";
 import Bookmarks from "./pages/Bookmarks";
 import WatchHistory from "./pages/WatchHistory";
 import Home from "./pages/Home";
-import AuthCallback from "./pages/AuthCallBack";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -179,7 +178,6 @@ function App() {
         {!isLoggedIn && <Route path="/" element={<Home />} />}
         {!isLoggedIn && <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />}
         {!isLoggedIn && <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />}
-        <Route path="/dashboard" element={<AuthCallback onLogin={handleLogin} />} />
 
         {isLoggedIn ? (
           <>
