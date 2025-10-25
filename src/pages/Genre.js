@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from 'axios';
+import axios from 'axios'; 
 import "../style/Select.css";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -8,7 +8,7 @@ const INTERESTS_API_URL = `${API_BASE_URL}/api/user/interests`;
 
 const genres = [
     { name: "Comedy", colorClass: "comedy" },
-    { name: "Romance", colorClass: "love" },
+    { name: "Romance", colorClass: "love" }, 
     { name: "Mystery", colorClass: "mystery" },
     { name: "Action", colorClass: "action" },
     { name: "Horror", colorClass: "horror" },
@@ -16,42 +16,46 @@ const genres = [
     { name: "Fantasy", colorClass: "fantasy" },
     { name: "Adventure", colorClass: "adventure" },
     { name: "Drama", colorClass: "drama" },
-    { name: "Science Fiction", colorClass: "scifi" },
+    { name: "Science Fiction", colorClass: "scifi" }, 
     { name: "Musical", colorClass: "musical" },
     { name: "Animation", colorClass: "animation" },
     { name: "Biography", colorClass: "biography" },
     { name: "Documentary", colorClass: "documentary" },
+   
 ];
 
 function Genre({ onNext }) {
-    const [selectedGenres, setSelectedGenres] = useState([]);
+  
+    const [selectedGenres, setSelectedGenres] = useState([]); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
     const navigate = useNavigate();
     const location = useLocation();
+    
     const selectedLanguage = location.state?.selectedLanguage;
 
     const toggleGenre = (genreName) => {
-        setError('');
+        setError(''); 
         setSelectedGenres(prevSelected =>
             prevSelected.includes(genreName)
-                ? prevSelected.filter(g => g !== genreName)
-                : [...prevSelected, genreName]
+                ? prevSelected.filter(g => g !== genreName) 
+                : [...prevSelected, genreName] 
         );
     };
 
     const handleNext = async () => {
         if (!selectedLanguage) {
-            setError("Preferred language was not selected. Please go back to the previous step.");
-            return;
+             setError("Preferred language was not selected. Please go back to the previous step.");
+             return; 
         }
         if (selectedGenres.length === 0) {
             setError("Please select at least one genre.");
-            return;
+            return; 
         }
 
         setLoading(true);
-        setError('');
+        setError(''); 
 
         try {
             const token = localStorage.getItem('authToken');
@@ -61,16 +65,17 @@ function Genre({ onNext }) {
                 navigate('/signin');
                 return;
             }
-            if (!API_BASE_URL) {
-                setError("API URL configuration error.");
-                setLoading(false);
-                return;
+             if (!API_BASE_URL) {
+                 setError("API URL configuration error.");
+                 setLoading(false);
+                 return;
             }
 
-            const response = await axios.post(
-                INTERESTS_API_URL,
+            console.log("Saving interests:", { genres: selectedGenres, preferredLanguage: selectedLanguage }); // Debug log
+
+            const response = await axios.post(INTERESTS_API_URL,
                 {
-                    genres: selectedGenres,
+                    genres: selectedGenres, 
                     preferredLanguage: selectedLanguage
                 },
                 {
@@ -78,10 +83,13 @@ function Genre({ onNext }) {
                 }
             );
 
+            console.log("Interests saved successfully:", response.data); 
             onNext(selectedGenres);
-            navigate("/home");
+
+            navigate("/home"); 
 
         } catch (err) {
+            console.error("Failed to save interests:", err.response?.data || err.message);
             setError(err.response?.data?.msg || "Failed to save preferences. Please try again.");
         } finally {
             setLoading(false);
@@ -91,8 +99,8 @@ function Genre({ onNext }) {
     return (
         <div className="selection-container">
             <h1 className="title">Choose your favourite genre(s)</h1>
-            {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '15px' }}>{error}</p>}
-            <p style={{ color: 'grey', textAlign: 'center', marginBottom: '20px' }}>
+             {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '15px' }}>{error}</p>}
+             <p style={{ color: 'grey', textAlign: 'center', marginBottom: '20px' }}>
                 Selected Language: {selectedLanguage || "None (Please go back)"}
             </p>
             <div className="grid">
@@ -118,4 +126,3 @@ function Genre({ onNext }) {
 }
 
 export default Genre;
-

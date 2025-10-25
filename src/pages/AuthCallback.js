@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
-function AuthCallback({ onLogin }) {
+function AuthCallBack({ onLogin }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    
     const token = searchParams.get('token');
 
     if (token) {
+      
       localStorage.setItem('authToken', token);
       
-      onLogin(token); 
+      onLogin(true); 
 
-      navigate('/'); 
+      navigate('/home'); 
     } else {
       navigate('/signin');
     }
@@ -34,4 +36,4 @@ function AuthCallback({ onLogin }) {
   );
 }
 
-export default AuthCallback;
+export default AuthCallBack;

@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../style/Movies.css";
+import "../style/Movies.css"; // This is still good to keep for global styles
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+// FIXED: Removed the semicolon from inside the template literal
 const BOOKMARK_API_URL = `${API_BASE_URL}/api/bookmarks`;
 
+// Using the more robust embed URL function from Recommended.js
 function getYouTubeEmbedUrl(url) {
   if (!url) return "";
   try {
     const videoUrl = new URL(url);
     const videoId = videoUrl.searchParams.get("v");
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+
     if (url.includes("youtube.com/embed/")) return url;
     return url;
   } catch {
@@ -18,6 +21,7 @@ function getYouTubeEmbedUrl(url) {
   }
 }
 
+// Copied from Recommended.js to add bookmarking from history
 const addBookmarkAPI = async (movieToAdd) => {
   if (!movieToAdd || !movieToAdd.id || !API_BASE_URL) {
     alert("Cannot bookmark this movie.");
@@ -26,7 +30,7 @@ const addBookmarkAPI = async (movieToAdd) => {
   try {
     const token = localStorage.getItem("authToken");
     if (!token) throw new Error("No auth token.");
-    await axios.post(
+    const response = await axios.post(
       BOOKMARK_API_URL,
       { movieId: Number(movieToAdd.id) },
       { headers: { Authorization: `Bearer ${token}` } }
@@ -47,6 +51,8 @@ function WatchHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // State for the new modal (copied from Recommended.js)
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState("");
@@ -65,6 +71,7 @@ function WatchHistory() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Style injection copied directly from Recommended.js
   useEffect(() => {
     const styles = `
       .recommendations-page {
@@ -128,7 +135,7 @@ function WatchHistory() {
         text-overflow: ellipsis;
       }
     `;
-    const styleId = "recommendations-styles";
+    const styleId = 'recommendations-styles'; // Use the same ID to avoid duplication
     if (!document.getElementById(styleId)) {
       const newStyleSheet = document.createElement("style");
       newStyleSheet.id = styleId;
@@ -138,12 +145,14 @@ function WatchHistory() {
     }
   }, []);
 
+  // Modal handlers copied from Recommended.js
   const handleMovieClick = (movie) => {
     if (!movie) return;
     const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
     setSelectedMovie(movie);
     setShowTrailer(true);
     setTrailerUrl(embedUrl || "");
+    // We don't need to add to watch history, since we're already in it.
   };
 
   const handleCloseModal = () => {
@@ -156,7 +165,7 @@ function WatchHistory() {
     return (
       <div className="recommendations-page">
         <h1>⭐ Watch History</h1>
-        <p style={{ textAlign: "center", color: "grey" }}>Loading history...</p>
+        <p style={{ textAlign: 'center', color: 'grey' }}>Loading history...</p>
       </div>
     );
   }
@@ -170,11 +179,12 @@ function WatchHistory() {
     );
   }
 
+  // This whole return block is updated to match Recommended.js
   return (
     <div className="recommendations-page">
       <h1>⭐ Watch History</h1>
       {history.length === 0 ? (
-        <p style={{ color: "grey", textAlign: "center" }}>
+        <p style={{ color: 'grey', textAlign: 'center' }}>
           No movies watched yet!
         </p>
       ) : (
@@ -189,10 +199,9 @@ function WatchHistory() {
                 <img
                   src={movie.poster_path}
                   alt={movie.title}
-                  onError={(e) => {
+                  onError={(e) => { // Copied from Recommended
                     e.target.onerror = null;
-                    e.target.src =
-                      "https://placehold.co/200x300/1a1a1a/FFF?text=No+Image";
+                    e.target.src = 'https://placehold.co/200x300/1a1a1a/FFF?text=No+Image';
                   }}
                 />
                 <h3>{movie.title}</h3>
@@ -202,10 +211,12 @@ function WatchHistory() {
         </div>
       )}
 
+      {/* Modal JSX copied directly from Recommended.js */}
       {showTrailer && selectedMovie && (
         <div className="trailer-modal" onClick={handleCloseModal}>
           <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
             <h2>{selectedMovie.title}</h2>
+
             {trailerUrl ? (
               <iframe
                 src={trailerUrl}
@@ -214,43 +225,43 @@ function WatchHistory() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 style={{
-                  border: "none",
-                  marginBottom: "15px",
-                  flexGrow: 1,
+                  border: 'none',
+                  marginBottom: '15px',
+                  flexGrow: 1
                 }}
               ></iframe>
             ) : (
               <p
                 style={{
                   flexGrow: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#ccc",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ccc'
                 }}
               >
                 No trailer available.
               </p>
             )}
+
             <button
               className="add-bookmark-button"
               onClick={() => addBookmarkAPI(selectedMovie)}
               style={{
-                background: "linear-gradient(45deg, #1e90ff, #4169e1)",
-                color: "white",
-                border: "none",
-                padding: "10px 20px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                alignSelf: "center",
-                marginBottom: "10px",
+                background: 'linear-gradient(45deg, #1e90ff, #4169e1)',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                alignSelf: 'center',
+                marginBottom: '10px'
               }}
             >
               🔖 Add to Bookmarks
             </button>
-            <button className="close-btn" onClick={handleCloseModal}>
-              ✖
-            </button>
+
+            <button className="close-btn" onClick={handleCloseModal}>✖</button>
           </div>
         </div>
       )}

@@ -14,8 +14,6 @@
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   width: 420px;
-  max-width: 95%; 
-  box-sizing: border-box;
 }
 
 .profile-card h1 {
@@ -68,8 +66,6 @@
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
-  flex-wrap: wrap; 
-  gap: 10px; 
 }
 
 button {
@@ -79,8 +75,6 @@ button {
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
-  flex: 1; 
-  min-width: 120px;
 }
 
 button:hover {
@@ -106,27 +100,4 @@ button:first-child {
   font-size: 14px;
   text-align: center;
   color: #ffcc80;
-}
-
-@media (max-width: 500px) {
-  .profile-card {
-    padding: 20px 15px;
-  }
-
-  .profile-card h1 {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-
-  .profile-field input,
-  .profile-field select,
-  .profile-field span {
-    font-size: 13px;
-    padding: 7px 10px;
-  }
-
-  button {
-    padding: 8px 14px;
-    font-size: 14px;
-  }
 }

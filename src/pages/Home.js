@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../style/Home.css";
-import bgImage from "../assets/bg.jpg"; 
+import "../style/Home.css"; 
 
-const messages = [
-    "Unlimited Movies.",
-    "Unlimited TV Shows.",
-    "Unlimited Entertainment.",
-    "Watch Anywhere, Anytime.",
-    "Cancel Anytime.",
-    "Your Entertainment, Your Way."
-];
-
-const Home = () => {
+function Home() {
     const navigate = useNavigate();
+
+    const messages = [
+        "Unlimited Movies.",
+        "Unlimited TV Shows.",
+        "Unlimited Entertainment.",
+        "Watch Anywhere, Anytime.",
+        "Cancel Anytime.",
+        "Your Entertainment, Your Way."
+    ];
+
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
     const [fade, setFade] = useState(true);
-    const [showCTA, setShowCTA] = useState(false);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -24,63 +23,40 @@ const Home = () => {
             setTimeout(() => {
                 setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
                 setFade(true);
-            }, 300);
-        }, 2500);
+            }, 300); // faster fade-out
+        }, 2000); // faster transition between sentences
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        const timer = setTimeout(() => setShowCTA(true), 800);
-        return () => clearTimeout(timer);
-    }, []);
-
-    const handleSignIn = () => navigate("/signin");
-    const handleSignUp = () => navigate("/signup");
-
-    const messageClass = fade ? "fade-in-slide" : "fade-out-slide";
-    const ctaClass = showCTA ? "fade-up-cta" : "hidden-cta";
-
     return (
-        <div id="flix-app">
-            <div
-                className="background-container"
-                style={{ backgroundImage: `url(${bgImage})` }}
-            ></div>
+        <>
+            <div className="background-container"></div>
             <div className="overlay"></div>
 
-            <header className="header">
-                <div className="logo">
-                    FLI<span>X</span>
-                </div>
-                <div className="header-buttons">
-                    <button className="signin-btn" onClick={handleSignIn}>
-                        Sign In
-                    </button>
-                    <button className="signup-btn" onClick={handleSignUp}>
-                        Sign Up
-                    </button>
-                </div>
-            </header>
+            <div className="header">
+                <button className="signin-btn" onClick={() => navigate("/signin")}>
+                    Sign In
+                </button>
+                <button className="signup-btn" onClick={() => navigate("/signup")}>
+                    Sign Up
+                </button>
+            </div>
 
-            <main className="hero-section">
+            <div className="hero-section">
                 <h1 className="hero-text">
-                    Your Entertainment <br />
-                    <span className="highlight">Unlimited</span>
+                    <span className="highlight">FLIX</span>
                 </h1>
 
-                <h2 className={`hero-message ${messageClass}`}>
+                <h2 className={`hero-message ${fade ? "fade-in" : "fade-out"}`}>
                     {messages[currentMessageIndex]}
                 </h2>
 
-                <button
-                    className={`cta-button ${ctaClass}`}
-                    onClick={handleSignUp}
-                >
+                <button className="cta-button" onClick={() => navigate("/signup")}>
                     Get Started
                 </button>
-            </main>
-        </div>
+            </div>
+        </>
     );
-};
+}
 
 export default Home;
