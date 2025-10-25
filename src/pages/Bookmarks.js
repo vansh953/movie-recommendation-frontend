@@ -3,10 +3,8 @@ import axios from "axios";
 import "../style/Movies.css";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-// Copied from Recommended.js
 const HISTORY_API_URL = `${API_BASE_URL}/api/user/history`;
 
-// Using the more robust embed URL function from Recommended.js
 function getYouTubeEmbedUrl(url) {
   if (!url) return "";
   try {
@@ -20,7 +18,6 @@ function getYouTubeEmbedUrl(url) {
   }
 }
 
-// Copied from Recommended.js to add to history when playing trailer
 const addToWatchHistoryAPI = async (movieId) => {
   if (!movieId || !API_BASE_URL) return;
   try {
@@ -41,8 +38,6 @@ function Bookmarks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Updated state to match Recommended.js
-  // selectedMovie will store the whole bookmark object ({ _id, movie })
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState("");
@@ -81,7 +76,6 @@ function Bookmarks() {
     setBookmarks((prev) =>
       prev.filter((bookmark) => bookmark._id !== bookmarkIdToRemove)
     );
-    // If the removed movie is the one in the modal, close the modal
     if (selectedMovie && selectedMovie._id === bookmarkIdToRemove) {
       handleCloseModal();
     }
@@ -97,15 +91,14 @@ function Bookmarks() {
     }
   };
 
-  // Replaced handleMovieSelect with logic from Recommended.js
   const handleMovieClick = (bookmark) => {
     if (!bookmark || !bookmark.movie) return;
     const movie = bookmark.movie;
     const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
-    setSelectedMovie(bookmark); // Store the whole bookmark object
+    setSelectedMovie(bookmark); 
     setShowTrailer(true);
     setTrailerUrl(embedUrl || "");
-    if (movie.id) addToWatchHistoryAPI(movie.id); // Add to history
+    if (movie.id) addToWatchHistoryAPI(movie.id); 
   };
 
   const handleCloseModal = () => {
@@ -114,8 +107,6 @@ function Bookmarks() {
     setTrailerUrl("");
   };
 
-  // Style injection copied directly from Recommended.js
-  // This REPLACES your old style injection
   useEffect(() => {
     const styles = `
       .recommendations-page {
@@ -189,18 +180,17 @@ function Bookmarks() {
     }
   }, []);
 
-  // Removed the old `if (selectedMovieData)` block
 
   return (
-    <div className="recommendations-page"> {/* CHANGED */}
-      <h1>⭐ Your Bookmarked Movies</h1> {/* CHANGED */}
+    <div className="recommendations-page"> {}
+      <h1>⭐ Your Bookmarked Movies</h1> {}
       {loading && <p style={{ color: "#fff", textAlign: "center" }}>Loading bookmarks...</p>}
       {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
       {!loading && !error && bookmarks.length === 0 && (
         <p style={{ color: "#fff", textAlign: "center" }}>No bookmarked movies yet!</p>
       )}
       {!loading && !error && bookmarks.length > 0 && (
-        <div className="movies-list"> {/* CHANGED */}
+        <div className="movies-list"> {}
           {bookmarks.map((bookmark) =>
             bookmark.movie ? (
               <div

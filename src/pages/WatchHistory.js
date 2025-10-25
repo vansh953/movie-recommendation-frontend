@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../style/Movies.css"; // This is still good to keep for global styles
+import "../style/Movies.css"; 
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-// FIXED: Removed the semicolon from inside the template literal
+
 const BOOKMARK_API_URL = `${API_BASE_URL}/api/bookmarks`;
 
-// Using the more robust embed URL function from Recommended.js
 function getYouTubeEmbedUrl(url) {
   if (!url) return "";
   try {
@@ -21,7 +20,6 @@ function getYouTubeEmbedUrl(url) {
   }
 }
 
-// Copied from Recommended.js to add bookmarking from history
 const addBookmarkAPI = async (movieToAdd) => {
   if (!movieToAdd || !movieToAdd.id || !API_BASE_URL) {
     alert("Cannot bookmark this movie.");
@@ -52,7 +50,6 @@ function WatchHistory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // State for the new modal (copied from Recommended.js)
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState("");
@@ -71,7 +68,6 @@ function WatchHistory() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Style injection copied directly from Recommended.js
   useEffect(() => {
     const styles = `
       .recommendations-page {
@@ -135,7 +131,7 @@ function WatchHistory() {
         text-overflow: ellipsis;
       }
     `;
-    const styleId = 'recommendations-styles'; // Use the same ID to avoid duplication
+    const styleId = 'recommendations-styles'; 
     if (!document.getElementById(styleId)) {
       const newStyleSheet = document.createElement("style");
       newStyleSheet.id = styleId;
@@ -145,14 +141,12 @@ function WatchHistory() {
     }
   }, []);
 
-  // Modal handlers copied from Recommended.js
   const handleMovieClick = (movie) => {
     if (!movie) return;
     const embedUrl = getYouTubeEmbedUrl(movie.trailer_link);
     setSelectedMovie(movie);
     setShowTrailer(true);
     setTrailerUrl(embedUrl || "");
-    // We don't need to add to watch history, since we're already in it.
   };
 
   const handleCloseModal = () => {
@@ -179,7 +173,6 @@ function WatchHistory() {
     );
   }
 
-  // This whole return block is updated to match Recommended.js
   return (
     <div className="recommendations-page">
       <h1>⭐ Watch History</h1>
@@ -199,7 +192,7 @@ function WatchHistory() {
                 <img
                   src={movie.poster_path}
                   alt={movie.title}
-                  onError={(e) => { // Copied from Recommended
+                  onError={(e) => { 
                     e.target.onerror = null;
                     e.target.src = 'https://placehold.co/200x300/1a1a1a/FFF?text=No+Image';
                   }}
@@ -211,7 +204,6 @@ function WatchHistory() {
         </div>
       )}
 
-      {/* Modal JSX copied directly from Recommended.js */}
       {showTrailer && selectedMovie && (
         <div className="trailer-modal" onClick={handleCloseModal}>
           <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
