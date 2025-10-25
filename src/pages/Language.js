@@ -1,46 +1,51 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "../style/Select.css";
 
-const languages = [ ];
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const languages = [
+  { name: "Hindi", colorClass: "hindi" },
+  { name: "English", colorClass: "english" },
+  { name: "Punjabi", colorClass: "punjabi" },
+  { name: "Haryanvi", colorClass: "haryanvi" },
+  { name: "Telugu", colorClass: "telugu" },
+  { name: "Tamil", colorClass: "tamil" },
+  { name: "Bengali", colorClass: "bengali" },
+  { name: "French", colorClass: "french" },
+  { name: "Spanish", colorClass: "spanish" },
+  { name: "Rajasthani", colorClass: "rajasthani" },
+  { name: "Marathi", colorClass: "marathi" },
+  { name: "Gujarati", colorClass: "gujarati" },
+  { name: "Awadhi", colorClass: "awadhi" },
+  { name: "Kannada", colorClass: "kannada" },
+  { name: "Malayalam", colorClass: "malayalam" },
+  { name: "Urdu", colorClass: "urdu" },
+];
 
-function Language({ onNext }) {
+function Language() {
   const [selected, setSelected] = useState("");
   const navigate = useNavigate();
-  const token = localStorage.getItem("authToken");
 
-  const toggleLanguage = (lang) => setSelected(selected === lang ? "" : lang);
+  const toggleLanguage = (lang) => {
+    setSelected(selected === lang ? "" : lang);
+  };
 
-  const handleNext = async () => {
-    if (!selected || !token) return;
-
-    try {
-      await axios.put(`${API_BASE_URL}/api/user/profile`, 
-        { preferredLanguage: selected }, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      onNext([selected]);
-      navigate("/select-genre");
-    } catch (err) {
-      console.error("Failed to save language:", err);
-      alert("Could not save language. Try again.");
-    }
+  const handleNext = () => {
+    navigate("/select-genre", { state: { selectedLanguage: selected } });
   };
 
   useEffect(() => {
-    const handlePopState = () => navigate("/signin", { replace: true });
+    const handlePopState = () => {
+      navigate("/signin", { replace: true });
+    };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [navigate]);
 
   return (
     <div className="selection-container">
-      <h1 className="title">Choose your Preferable Language</h1>
+      <h1 className="title">Choose your Preferable language</h1>
       <div className="grid">
-        {languages.map(lang => (
+        {languages.map((lang) => (
           <button
             key={lang.name}
             className={`card ${lang.colorClass} ${selected === lang.name ? "selected" : ""}`}
