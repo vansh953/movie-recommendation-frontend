@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
@@ -156,8 +156,33 @@ function App() {
       </div>
     );
 
+  // ✅ Navbar visible only when logged in and setup done
+  const Navbar = () => (
+    <nav className="navbar1">
+      <div className="navbar-logo">Farm2Home</div>
+      <div className="navbar-links">
+        <Link to="/home" className="nav-link">
+          Home
+        </Link>
+        <Link to="/recommended" className="nav-link">
+          Recommended
+        </Link>
+        <Link to="/watch-history" className="nav-link">
+          Watch History
+        </Link>
+        <Link to="/bookmarks" className="nav-link">
+          Bookmarks
+        </Link>
+        <Link to="/my-profile" className="nav-link">
+          My Profile
+        </Link>
+      </div>
+    </nav>
+  );
+
   return (
     <>
+      {isLoggedIn && !firstLogin && <Navbar />}
 
       <Routes>
         {!isLoggedIn && <Route path="/" element={<Home />} />}
