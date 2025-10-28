@@ -1,4 +1,4 @@
-.bookmarks-page {
+.watchhistory-page {
   padding: 20px;
   padding-top: 80px;
   color: #fff;
@@ -7,7 +7,7 @@
   text-align: center;
 }
 
-.bookmarks-page h1 {
+.watchhistory-page h1 {
   color: #ff3b3f;
   margin-bottom: 20px;
   font-size: 1.8rem;
@@ -110,7 +110,7 @@
     gap: 20px;
   }
 
-  .bookmarks-page h1 {
+  .watchhistory-page h1 {
     font-size: 1.6rem;
   }
 }
@@ -121,7 +121,7 @@
     gap: 15px;
   }
 
-  .bookmarks-page h1 {
+  .watchhistory-page h1 {
     font-size: 1.4rem;
   }
 
@@ -145,7 +145,7 @@
     font-size: 0.8rem;
   }
 
-  .bookmarks-page h1 {
+  .watchhistory-page h1 {
     font-size: 1.3rem;
   }
 

@@ -159,7 +159,7 @@ function App() {
     ];
     return (
       <nav className="navbar1">
-        <div className="navbar-logo">Farm2Home</div>
+        <div className="navbar-logo"></div>
         <div className="navbar-links">
           {links.map((link) => (
             <Link

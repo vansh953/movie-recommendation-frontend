@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../style/Movies.css"; 
+import "../style/WatchHistory.css"; 
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
