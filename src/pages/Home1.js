@@ -31,7 +31,6 @@ function Home1() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const [fade, setFade] = useState(true);
-
   const location = useLocation();
 
   const getActive = (path) => {
@@ -40,6 +39,7 @@ function Home1() {
       case "/recommended": return "recommended";
       case "/movies": return "movies";
       case "/watch-history": return "history";
+      case "/bookmark": return "bookmark";
       case "/my-profile": return "profile";
       default: return "";
     }
@@ -86,7 +86,6 @@ function Home1() {
 
   return (
     <div className="home1-container">
-      {/* Navbar Section */}
       <nav className="navbar1">
         <div className="navbar-logo">🎬 Flix</div>
         <div className="navbar-links">
@@ -94,89 +93,56 @@ function Home1() {
           <Link to="/recommended" className={`nav-link ${active === "recommended" ? "active" : ""}`}>⭐ Recommended</Link>
           <Link to="/movies" className={`nav-link ${active === "movies" ? "active" : ""}`}>🎞️ Movies</Link>
           <Link to="/watch-history" className={`nav-link ${active === "history" ? "active" : ""}`}>📜 Watch History</Link>
-          <Link to="/my-profile" className={`nav-link ${active === "profile" ? "active" : ""}`}>👤 My Profile</Link>
+          <Link to="/bookmark" className={`nav-link ${active === "bookmark" ? "active" : ""}`}>🔖 Bookmark</Link>
+        </div>
+        <div className="navbar-profile">
+          <Link to="/my-profile" className={`profile-icon ${active === "profile" ? "active" : ""}`}>👤</Link>
         </div>
       </nav>
 
-      {/* Movie Display Section */}
       {!selectedMovie ? (
         <div className={`movie-box ${fade ? "fade-in" : "fade-out"}`}>
-          <img
-            src={movies[currentIndex].cover}
-            alt={movies[currentIndex].title}
-            className="movie-image"
-          />
+          <img src={movies[currentIndex].cover} alt={movies[currentIndex].title} className="movie-image" />
           <button className="arrow left" onClick={handlePrev}>◀</button>
           <div className="movie-caption">
             <h2>{movies[currentIndex].title}</h2>
             <p>{movies[currentIndex].shortDesc}</p>
-            <button
-              className="details-btn"
-              onClick={() => setSelectedMovie(movies[currentIndex])}
-            >
+            <button className="details-btn" onClick={() => setSelectedMovie(movies[currentIndex])}>
               View Details
             </button>
           </div>
           <button className="arrow right" onClick={handleNext}>▶</button>
           <div className="dots-container">
             {movies.map((_, idx) => (
-              <span
-                key={idx}
-                className={`dot ${currentIndex === idx ? "active" : ""}`}
-                onClick={() => setCurrentIndex(idx)}
-              ></span>
+              <span key={idx} className={`dot ${currentIndex === idx ? "active" : ""}`} onClick={() => setCurrentIndex(idx)}></span>
             ))}
           </div>
         </div>
       ) : (
         <div className="split-view">
           <div className="split-left">
-            <img
-              src={selectedMovie.cover}
-              alt={selectedMovie.title}
-              className="split-image"
-            />
+            <img src={selectedMovie.cover} alt={selectedMovie.title} className="split-image" />
           </div>
           <div className="split-right">
             <h2>{selectedMovie.title}</h2>
             <p>{selectedMovie.longDesc}</p>
-
             {!showTrailer ? (
-              <button
-                className="play-btn"
-                onClick={() => handlePlayTrailer(selectedMovie)}
-              >
+              <button className="play-btn" onClick={() => handlePlayTrailer(selectedMovie)}>
                 ▶ Play Trailer
               </button>
             ) : (
-              <div
-                className="trailer-container"
-                style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}
-              >
+              <div className="trailer-container" style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
                 <iframe
                   src={selectedMovie.trailer}
                   title={selectedMovie.title}
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
                 ></iframe>
               </div>
             )}
-
-            <button
-              className="close-btn"
-              onClick={() => {
-                setSelectedMovie(null);
-                setShowTrailer(false);
-              }}
-            >
+            <button className="close-btn" onClick={() => { setSelectedMovie(null); setShowTrailer(false); }}>
               Close
             </button>
           </div>

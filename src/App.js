@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate, Link } from "react-router-dom";
+import { Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
@@ -28,20 +28,16 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-
     if (token) {
       try {
         const decoded = jwtDecode(token);
         const currentTime = Date.now() / 1000;
-
         if (decoded.exp < currentTime) {
           handleLogout();
           return;
         }
-
         setIsLoggedIn(true);
         setUserId(decoded.id);
-
         const fetchProfile = async () => {
           if (!API_BASE_URL) {
             setFirstLogin(true);
@@ -58,9 +54,7 @@ function App() {
                 res.data.preferredLanguage ? [res.data.preferredLanguage] : []
               );
               setSelectedGenres(res.data.genres);
-            } else {
-              setFirstLogin(true);
-            }
+            } else setFirstLogin(true);
           } catch {
             setFirstLogin(true);
           } finally {
@@ -81,7 +75,6 @@ function App() {
 
   const handleLogin = (tokenOrId) => {
     let id, tokenToUse;
-
     if (typeof tokenOrId === "string" && tokenOrId.length > 50) {
       try {
         const decoded = jwtDecode(tokenOrId);
@@ -96,11 +89,9 @@ function App() {
       tokenToUse = localStorage.getItem("authToken");
       if (!tokenToUse) return;
     }
-
     if (id && tokenToUse) {
       setIsLoggedIn(true);
       setUserId(id);
-
       const fetchProfile = async () => {
         try {
           const res = await axios.get(`${API_BASE_URL}/api/user/profile`, {
@@ -156,63 +147,55 @@ function App() {
       </div>
     );
 
-  // ✅ Navbar visible only when logged in and setup done
-  const Navbar = () => (
-    <nav className="navbar1">
-      <div className="navbar-logo">Farm2Home</div>
-      <div className="navbar-links">
-        <Link to="/home" className="nav-link">
-          Home
-        </Link>
-        <Link to="/recommended" className="nav-link">
-          Recommended
-        </Link>
-        <Link to="/watch-history" className="nav-link">
-          Watch History
-        </Link>
-        <Link to="/bookmarks" className="nav-link">
-          Bookmarks
-        </Link>
-        <Link to="/my-profile" className="nav-link">
-          My Profile
-        </Link>
-      </div>
-    </nav>
-  );
+  const Navbar = () => {
+    const location = useLocation();
+    const currentPath = location.pathname;
+    const links = [
+      { path: "/home", label: "Home" },
+      { path: "/movies", label: "Movies" },
+      { path: "/recommended", label: "Recommended" },
+      { path: "/watch-history", label: "Watch History" },
+      { path: "/bookmarks", label: "Bookmarks" },
+    ];
+    return (
+      <nav className="navbar1">
+        <div className="navbar-logo">Farm2Home</div>
+        <div className="navbar-links">
+          {links.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`nav-link ${currentPath === link.path ? "active" : ""}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+        <div className="profile-icon" onClick={() => (window.location.href = "/my-profile")}>
+          👤
+        </div>
+      </nav>
+    );
+  };
 
   return (
     <>
       {isLoggedIn && !firstLogin && <Navbar />}
-
       <Routes>
         {!isLoggedIn && <Route path="/" element={<Home />} />}
-        {!isLoggedIn && (
-          <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />
-        )}
-        {!isLoggedIn && (
-          <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />
-        )}
+        {!isLoggedIn && <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />}
+        {!isLoggedIn && <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />}
         <Route path="/dashboard" element={<AuthCallBack onLogin={handleLogin} />} />
-
         {isLoggedIn && firstLogin && (
           <>
-            <Route
-              path="/select-language"
-              element={<Language onNext={handleLanguageSelect} />}
-            />
+            <Route path="/select-language" element={<Language onNext={handleLanguageSelect} />} />
             <Route
               path="/select-genre"
-              element={
-                <Genre
-                  selectedLanguages={selectedLanguages}
-                  onNext={handleGenreSelect}
-                />
-              }
+              element={<Genre selectedLanguages={selectedLanguages} onNext={handleGenreSelect} />}
             />
             <Route path="*" element={<Navigate to="/select-language" replace />} />
           </>
         )}
-
         {isLoggedIn && !firstLogin && (
           <>
             <Route
@@ -225,18 +208,14 @@ function App() {
                 />
               }
             />
-            <Route path="/recommended" element={<Recommended userId={userId} />} />
             <Route path="/movies" element={<Movies />} />
-            <Route
-              path="/my-profile"
-              element={<MyProfile userId={userId} onLogout={handleLogout} />}
-            />
-            <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="/recommended" element={<Recommended userId={userId} />} />
             <Route path="/watch-history" element={<WatchHistory />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="/my-profile" element={<MyProfile userId={userId} onLogout={handleLogout} />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </>
         )}
-
         {!isLoggedIn && <Route path="*" element={<Navigate to="/" replace />} />}
       </Routes>
     </>
