@@ -1,3 +1,57 @@
+.navbar1 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background: linear-gradient(90deg, #121212, #232323);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.navbar-logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #fff;
+  border-bottom: 2px solid #ff4c29;
+}
+
+@media (max-width: 768px) {
+  .navbar1 {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
 .home1-container {
   width: 100%;
   height: calc(100vh - 70px);
@@ -12,7 +66,7 @@
 
 .movie-box {
   position: relative;
-  width: 100%; 
+  width: 100%;
   height: 94%;
   border-radius: 12px;
   overflow: hidden;
@@ -25,8 +79,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(1.02); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .movie-image {
@@ -174,6 +234,7 @@
   margin-bottom: 30px;
 }
 
+
 .play-btn,
 .close-btn {
   background: linear-gradient(45deg, #ff3b3f, #ff6b6b);
@@ -193,33 +254,14 @@
   transform: translateY(-2px);
 }
 
-/* Bookmark Button */
-.bookmark-btn {
-  background: linear-gradient(45deg, #ffd700, #ffcc00);
-  border: none;
-  color: #000;
-  padding: 12px 30px;
-  border-radius: 10px;
-  font-size: 1.1em;
-  margin-bottom: 15px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-.bookmark-btn:hover {
-  background: #ffc107;
-  transform: translateY(-2px);
-}
-
 .split-right button {
   display: block;
   width: fit-content;
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
-  .movie-box, .split-view {
+  .movie-box,
+  .split-view {
     width: 100%;
     height: 92%;
   }
@@ -277,14 +319,16 @@
     font-size: 1em;
   }
 
-  .play-btn, .close-btn, .bookmark-btn {
+  .play-btn,
+  .close-btn {
     padding: 10px 25px;
     font-size: 1em;
   }
 }
 
 @media (max-width: 480px) {
-  .movie-box, .split-view {
+  .movie-box,
+  .split-view {
     height: 90%;
     width: 100%;
   }
@@ -302,7 +346,8 @@
     font-size: 0.9em;
   }
 
-  .play-btn, .close-btn, .bookmark-btn {
+  .play-btn,
+  .close-btn {
     padding: 8px 18px;
     font-size: 0.9em;
   }
@@ -325,4 +370,3 @@
   opacity: 0;
   transition: opacity 0.8s ease-in-out;
 }
-

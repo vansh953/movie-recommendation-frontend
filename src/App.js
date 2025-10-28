@@ -8,14 +8,14 @@ import SignUp from "./pages/SignUp";
 import Language from "./pages/Language";
 import Genre from "./pages/Genre";
 import Home1 from "./pages/Home1";
-import Navbar1 from "./pages/Navbar1";
 import Movies from "./pages/Movies";
 import Recommended from "./pages/Recommended";
 import MyProfile from "./pages/MyProfile";
 import Bookmarks from "./pages/Bookmarks";
 import WatchHistory from "./pages/WatchHistory";
 import Home from "./pages/Home";
-import AuthCallBack from "./pages/AuthCallback"; 
+import AuthCallBack from "./pages/AuthCallBack";
+
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function App() {
@@ -158,20 +158,31 @@ function App() {
 
   return (
     <>
-      {isLoggedIn && !firstLogin && <Navbar1 onLogout={handleLogout} />}
 
       <Routes>
         {!isLoggedIn && <Route path="/" element={<Home />} />}
-        {!isLoggedIn && <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />}
-        {!isLoggedIn && <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />}
+        {!isLoggedIn && (
+          <Route path="/signin" element={<SignIn onLogin={handleLogin} />} />
+        )}
+        {!isLoggedIn && (
+          <Route path="/signup" element={<SignUp onLogin={handleLogin} />} />
+        )}
         <Route path="/dashboard" element={<AuthCallBack onLogin={handleLogin} />} />
 
         {isLoggedIn && firstLogin && (
           <>
-            <Route path="/select-language" element={<Language onNext={handleLanguageSelect} />} />
+            <Route
+              path="/select-language"
+              element={<Language onNext={handleLanguageSelect} />}
+            />
             <Route
               path="/select-genre"
-              element={<Genre selectedLanguages={selectedLanguages} onNext={handleGenreSelect} />}
+              element={
+                <Genre
+                  selectedLanguages={selectedLanguages}
+                  onNext={handleGenreSelect}
+                />
+              }
             />
             <Route path="*" element={<Navigate to="/select-language" replace />} />
           </>
@@ -181,11 +192,20 @@ function App() {
           <>
             <Route
               path="/home"
-              element={<Home1 selectedLanguages={selectedLanguages} selectedGenres={selectedGenres} />}
+              element={
+                <Home1
+                  selectedLanguages={selectedLanguages}
+                  selectedGenres={selectedGenres}
+                  onLogout={handleLogout}
+                />
+              }
             />
             <Route path="/recommended" element={<Recommended userId={userId} />} />
             <Route path="/movies" element={<Movies />} />
-            <Route path="/my-profile" element={<MyProfile userId={userId} onLogout={handleLogout} />} />
+            <Route
+              path="/my-profile"
+              element={<MyProfile userId={userId} onLogout={handleLogout} />}
+            />
             <Route path="/bookmarks" element={<Bookmarks />} />
             <Route path="/watch-history" element={<WatchHistory />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
