@@ -14,7 +14,7 @@ import MyProfile from "./pages/MyProfile";
 import Bookmarks from "./pages/Bookmarks";
 import WatchHistory from "./pages/WatchHistory";
 import Home from "./pages/Home";
-import AuthCallBack from "./pages/AuthCallBack";
+import AuthCallBack from "./pages/AuthCallback";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
